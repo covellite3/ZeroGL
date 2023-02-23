@@ -7,6 +7,8 @@
 // Import header file.
 #include "zerogl/opengl/ShaderProgram.hpp"
 
+#include <fstream>
+
 namespace zgl
 {
 	GLuint ShaderProgram::m_handleBinded = 0;
@@ -104,6 +106,21 @@ namespace zgl
 			default: output << "No errors found." << std::endl; return;
 		}		
 	}
+
+	/*size_t ShaderProgram::loadTextFile (std::stringstream& outputText, const char* p_rootfolder, const char* p_localpath)
+	{
+		char buffer[512];
+		size_t nbytes = 0;
+		std::fstream file(std::string(p_rootfolder)+std::string(p_localpath));
+		while (!file.eof()) {
+			getline(buffer, sizeof(buffer)*sizeof(char));
+			//if (isPreprocessorInclude(buffer))
+			//	includePreprocessor(outputText, buffer, sizeof(buffer));
+			outputText << buffer;
+		}
+		file.close();
+		return nbytes;
+	}*/
 
 	void ShaderProgram::attachShader (const GLenum e, const GLchar* p_src)
 	{

@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
 
-#include <zerogl/ZeroGL.hpp>
+#include "zerogl/ZeroGL.hpp"
+#include "zerogl/mesh/CubeMesh.hpp"
 
 #include <SFML/OpenGL.hpp>
 #include <SFML/Window.hpp>
@@ -35,6 +36,7 @@ void main()\n\
     FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n\
 } ";
 
+CubeMesh cubemesh(false);
 ArrayBuffer vbo;
 VertexArray vao;
 ShaderProgram shaderProgram;
@@ -58,7 +60,7 @@ inline void init ()
 
 	std::cout << "VBO" << std::endl;
 	vbo.init();
-	vbo.send(sizeof(vertices), vertices, GL_STATIC_DRAW);
+	vbo.send(cubemesh.getLenght()*sizeof(glm::vec3), cubemesh.get3DPositions(), GL_STATIC_DRAW);
 	zglCheckOpenGL();
 
 	std::cout << "VAO" << std::endl;
@@ -77,7 +79,7 @@ inline void pipeline ()
 
 	auto scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 	auto rotateMat = glm::rotate(glm::mat4(1.0f), glm::radians(foo*200), glm::vec3(1.5f, 0.0f, 1.0f));
-	auto translateMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -0.5f-foo));
+	auto translateMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f-foo));
 
 	auto modelMat = translateMat * rotateMat * scaleMat;
 	auto viewMat(1.0f);
@@ -88,7 +90,7 @@ inline void pipeline ()
 
 	auto location = shaderProgram.getUniformLocation("u_modelViewProjMat");
 	shaderProgram.setUniform(location, modelViewProjMat);
-	shaderProgram.draw(vao, GL_TRIANGLES, 0, 3);
+	shaderProgram.draw(vao, GL_TRIANGLES, 0, cubemesh.getLenght());
 	foo += 0.01f;
 }
 

@@ -8,7 +8,7 @@
 #define H_ZGL_ZEROGL_ZEROGL
 
 // Includes
-#include <zerogl/opengl/OpenGL.hpp>
+#include "zerogl/opengl/OpenGL.hpp"
 // End includes
 
 namespace zgl

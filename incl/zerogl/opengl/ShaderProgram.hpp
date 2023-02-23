@@ -10,6 +10,7 @@
 // Includes
 #include "zerogl/ZeroGL.hpp"
 #include <ostream>
+#include <sstream>
 #include <stdexcept>
 #include <type_traits>
 // End includes
@@ -22,6 +23,8 @@ namespace zgl
 	 * @author: Corentin Asso
 	 * @date: 2023-02-10
 	 * @brief: OpengGL's shader program wrapper.
+	 * TODO Hot reloading.
+	 * TODO Preprocessor include.
 	 */
 	class ShaderProgram
 	{
@@ -81,6 +84,9 @@ namespace zgl
 		/** TODO comment */
 		void showErrors (std::ostream& output);
 
+		/** TODO comment */
+		size_t loadTextFile (std::stringstream& outputText, const char* p_rootfolder, const char* p_localpath);
+
 		/** Attach a shader of given GLenum to the program. */
 		void attachShader (const GLenum e, const GLchar* p_src);
 
@@ -91,7 +97,10 @@ namespace zgl
 		inline void attachVertexShader (const GLchar* p_src) { attachShader(GL_VERTEX_SHADER, p_src); }
 
 		/** TODO comment */
-		inline void attachTessellationShader (const GLchar* p_src) { attachShader(GL_TESS_EVALUATION_SHADER, p_src); }
+		inline void attachTessControleShader (const GLchar* p_src) { attachShader(GL_TESS_CONTROL_SHADER, p_src); }
+
+		/** TODO comment */
+		inline void attachTessEvaluationShader (const GLchar* p_src) { attachShader(GL_TESS_EVALUATION_SHADER, p_src); }
 
 		/** TODO comment */
 		inline void attachGeometryShade (const GLchar* p_src) { attachShader(GL_GEOMETRY_SHADER, p_src); }

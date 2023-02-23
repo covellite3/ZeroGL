@@ -59,6 +59,9 @@ namespace zgl
 				const void* offset,
 				const ArrayBuffer& vbo)
 		{
+			assert(index < GL_MAX_VERTEX_ATTRIBS);
+			assert(index <= 4);
+			assert(stride >= 0);
 			assert(isInit());
 			zglCheckOpenGL();
 			ArrayBuffer::bind(vbo);
