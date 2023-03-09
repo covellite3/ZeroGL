@@ -60,7 +60,7 @@ inline void init ()
 
 	std::cout << "VBO" << std::endl;
 	vbo.init();
-	vbo.send(cubemesh.getLenght()*sizeof(glm::vec3), cubemesh.get3DPositions(), GL_STATIC_DRAW);
+	vbo.send(cubemesh.getNumberOfVerticies()*sizeof(glm::vec3), cubemesh.get3DPositions(), GL_STATIC_DRAW);
 	zglCheckOpenGL();
 
 	std::cout << "VAO" << std::endl;
