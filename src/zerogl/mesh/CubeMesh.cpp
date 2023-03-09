@@ -48,13 +48,19 @@ namespace zgl
 		return NULL;
 	}
 
-	size_t CubeMesh::getLenght () const
+	size_t CubeMesh::getNumberOfVerticies () const
 	{
 		if (m_useIndex) {
-			return 0;
+			return m_indexedLenght;
 		} else {
 			return m_unindexedLenght;
 		}
+	}
+
+	size_t CubeMesh::getNumberOfIndicies () const
+	{
+		assert(useIndex());
+		return m_unindexedLenght;
 	}
 
 	bool CubeMesh::useIndex () const
@@ -64,7 +70,7 @@ namespace zgl
 
 	IMesh::Dimensions CubeMesh::getDim () const
 	{
-		return 3D;
+		return IMesh::Dimensions::THREE_DIM;
 	}
 
 } // End namespace zgl

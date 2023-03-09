@@ -79,21 +79,60 @@ namespace zgl
 			{-1.0f, 1.0f, 1.0f},
 			{ 1.0f,-1.0f, 1.0f}
 		};
+
+		static constexpr size_t m_indexedLenght = 8;
+
+		static constexpr glm::vec3 m_indexedPos3[m_indexedLenght] = {
+			{ -1.0f, -1.0f,  1.0f },
+			{  1.0f, -1.0f,  1.0f },
+			{ -1.0f,  1.0f,  1.0f },
+			{  1.0f,  1.0f,  1.0f },
+			{ -1.0f, -1.0f, -1.0f },
+			{  1.0f, -1.0f, -1.0f },
+			{ -1.0f,  1.0f, -1.0f },
+			{  1.0f,  1.0f, -1.0f } 
+		};
+
+		static constexpr GLuint m_indices[m_unindexedLenght] = {
+			//Top
+			2, 6, 7,
+			2, 3, 7,
+
+			//Bottom
+			0, 4, 5,
+			0, 1, 5,
+
+			//Left
+			0, 2, 6,
+			0, 4, 6,
+
+			//Right
+			1, 3, 7,
+			1, 5, 7,
+
+			//Front
+			0, 2, 3,
+			0, 1, 3,
+
+			//Back
+			4, 6, 7,
+			4, 5, 7
+		};
 	protected:
 	public:
 		/** TODO comment */
 		CubeMesh(bool useIndex);
 
-		virtual const glm::vec2* get2DPositions () const override;
-		virtual const glm::vec3* get3DPositions () const override;
-		virtual const glm::vec3* getRGBColors () const override;
-		virtual const glm::vec3* getNormals () const override;
-		virtual const glm::vec2* getUVcoords () const override;
-		virtual const size_t* getIndicies () const override;
-		//virtual GLenum getRenderingMode () const override;
-		virtual size_t getLenght () const override;
-		virtual bool useIndex () const override;
-		virtual Dimensions getDim () const override;
+		const glm::vec2* get2DPositions () const;
+		const glm::vec3* get3DPositions () const;
+		const glm::vec3* getRGBColors () const;
+		const glm::vec3* getNormals () const;
+		const glm::vec2* getUVcoords () const;
+		const size_t* getIndicies () const;
+		//GLenum getRenderingMode () const;
+		size_t getLenght () const;
+		bool useIndex () const;
+		Dimensions getDim () const;
 
 
 	}; // End class CubeMesh

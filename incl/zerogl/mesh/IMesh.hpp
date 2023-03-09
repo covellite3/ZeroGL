@@ -27,7 +27,8 @@ namespace zgl
 	private:
 	protected:
 	public:
-		enum class Dimensions { 2D, 3D };
+		//typedef enum { TWO_DIM = 2, THREE_DIM = 3 } Dimensions;
+		enum class Dimensions { TWO_DIM = 2, THREE_DIM = 3 };
 
 		IMesh ();
 
@@ -53,7 +54,10 @@ namespace zgl
 		//virtual GLenum getRenderingMode ();
 
 		/** Number of verticies. */
-		virtual size_t getLenght () const = 0;
+		virtual size_t getNumberOfVerticies () const = 0;
+
+		/** Number of indicies. */
+		virtual size_t getNumberOfIndicies () const = 0;
 
 		/** Say if we use an index for this mesh. */
 		virtual bool useIndex () const = 0;
