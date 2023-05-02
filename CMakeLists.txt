@@ -76,9 +76,9 @@ set(LIST_LIB_NAMES
 	GLEW
 	GLESv1 GLESv1_CM GLESv1_CM_nvidia GLESv2 GLESv2_nvidia
 	pthread
-	SDL SDL2
+	#SDL SDL2
 	sfml-network sfml-window sfml-graphics sfml-system
-	glfw
+	#glfw
 )
 
 # Hints to where libs are
@@ -140,12 +140,14 @@ message(STATUS "")
 set(LIST_BIN_NAMES
 	unittest
 	example
+	#example_cube
 )
 # Subdirectories starting from SRC_DIR containing
 # the sources files with 'main.cpp' for each
 # executables (binaries).
 set(unittest_MAIN_PATH test)
-set(example_MAIN_PATH example)
+set(example_MAIN_PATH example1)
+#set(example_cube_MAIN_PATH example2)
 foreach(BIN_NAME ${LIST_BIN_NAMES})
 	##############
 	### BINARY ###

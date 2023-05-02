@@ -1,8 +1,10 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 
 #include "zerogl/ZeroGL.hpp"
 #include "zerogl/mesh/CubeMesh.hpp"
+#include "zerogl/Model.hpp"
 
 #include <SFML/OpenGL.hpp>
 #include <SFML/Window.hpp>
@@ -10,45 +12,44 @@
 
 using namespace zgl;
 
-float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-};
+std::string vertexShaderSource, fragmentShaderSource;
 
-const GLchar* vertexShaderSource =
-"#version 330 core\n\
-layout (location = 0) in vec3 aPos;\n\
-\n\
-uniform mat4 u_modelViewProjMat;\n\
-\n\
-void main()\n\
-{\n\
-    gl_Position = u_modelViewProjMat * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n\
-}";
-
-const GLchar* fragmentShaderSource =
-"#version 330 core\n\
-out vec4 FragColor;\n\
-\n\
-void main()\n\
-{\n\
-    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n\
-} ";
-
-CubeMesh cubemesh(false);
-ArrayBuffer vbo;
-VertexArray vao;
+CubeMesh cubemesh(true);
+Model model;
 ShaderProgram shaderProgram;
 size_t width = 0, height = 0;
 
+void readFile(std::stringstream& ss, const std::string& filepath) {
+	char buffer[256];
+	std::ifstream ifs;
+	ifs.open(filepath, std::ios::in);
+       	while (!ifs.eof()) {
+		ifs.read(buffer, sizeof(buffer)-1);
+		auto count =  ifs.gcount();
+		buffer[count] = '\0';
+		ss << buffer;
+	}
+	ifs.close();
+}
+
 inline void init ()
 {
+	std::stringstream ss;
+	readFile(ss, "assets/lib/std/basicVertexShader.glsl");
+	vertexShaderSource = ss.str();
+	ss.str(std::string());
+	std::cout << vertexShaderSource << std::endl;
+
+	readFile(ss, "assets/lib/std/basicFragmentShader.glsl");
+	fragmentShaderSource = ss.str();
+	ss.str(std::string());
+	std::cout << fragmentShaderSource << std::endl;
+
 	zglCheckOpenGL();
 	std::cout << "Shader" << std::endl;
 	shaderProgram.init();
-	shaderProgram.attachVertexShader(vertexShaderSource);
-	shaderProgram.attachFragmentShader(fragmentShaderSource);
+	shaderProgram.attachVertexShader(vertexShaderSource.c_str());
+	shaderProgram.attachFragmentShader(fragmentShaderSource.c_str());
 	if (!shaderProgram.compile()) {
 		shaderProgram.showErrors(std::cout);
 		exit(EXIT_FAILURE);
@@ -58,39 +59,43 @@ inline void init ()
 		exit(EXIT_FAILURE);
 	}
 
-	std::cout << "VBO" << std::endl;
-	vbo.init();
-	vbo.send(cubemesh.getNumberOfVerticies()*sizeof(glm::vec3), cubemesh.get3DPositions(), GL_STATIC_DRAW);
-	zglCheckOpenGL();
+	std::cout << "Model" << std::endl;
+	model.init(cubemesh);
 
-	std::cout << "VAO" << std::endl;
-	vao.init();
-	vao.enableAttribPointer(0);
-	vao.setAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0, vbo);
+	std::cout << "OpenGL's options." << std::endl;
+	glEnable(GL_DEPTH_TEST);  
+	zglCheckOpenGL();
 }
 
 float foo = 0;
 inline void pipeline ()
 {
 	zglCheckOpenGL();
-	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+	glClearColor(0.5f, 0.5f, 0.75f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+	glm::mat4 rotateMat = glm::rotate(glm::mat4(1.0f), glm::radians(foo*200), glm::vec3(1.5f, 0.0f, 1.0f));
+	glm::mat4 translateMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f-foo));
 
-	auto scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-	auto rotateMat = glm::rotate(glm::mat4(1.0f), glm::radians(foo*200), glm::vec3(1.5f, 0.0f, 1.0f));
-	auto translateMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f-foo));
+	glm::mat4 modelMat = translateMat * rotateMat * scaleMat;
+	glm::mat4 viewMat(1.0f);
+	glm::mat4 projMat = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.1f, 100.0f);
 
-	auto modelMat = translateMat * rotateMat * scaleMat;
-	auto viewMat(1.0f);
-	auto projMat = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.1f, 100.0f);
+	auto loc = shaderProgram.getUniformLocation("u_modelMat");
+	shaderProgram.setUniform(loc, modelMat);
 
-	auto modelViewProjMat = projMat * viewMat * modelMat;
+	loc = shaderProgram.getUniformLocation("u_viewMat");
+	shaderProgram.setUniform(loc, viewMat);
 
+	loc = shaderProgram.getUniformLocation("u_projMat");
+	shaderProgram.setUniform(loc, projMat);
 
-	auto location = shaderProgram.getUniformLocation("u_modelViewProjMat");
-	shaderProgram.setUniform(location, modelViewProjMat);
-	shaderProgram.draw(vao, GL_TRIANGLES, 0, cubemesh.getLenght());
+	loc = shaderProgram.getUniformLocation("u_lightVector");
+	glm::vec3 lightVector = glm::normalize(glm::vec3(1.0f, -1.0f, -1.0f));
+	shaderProgram.setUniform(loc, lightVector);
+
+	model.render(shaderProgram, GL_TRIANGLES);
 	foo += 0.01f;
 }
 

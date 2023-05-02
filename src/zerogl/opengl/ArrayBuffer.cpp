@@ -9,21 +9,24 @@
 
 namespace zgl
 {
-	GLuint ArrayBuffer::m_handleBinded = 0;
+	std::array<GLuint, ArrayBuffer::s_numberMaxOfTargets> ArrayBuffer::s_handlesBinded {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+
 	size_t ArrayBuffer::m_count = 0;
 
-	ArrayBuffer::ArrayBuffer () : m_handle(0), m_size(0)
+	ArrayBuffer::ArrayBuffer () : m_handle(0), m_target(0), m_size(0)
 	{
-		
+		// Empty
 	}
 
 	ArrayBuffer::~ArrayBuffer()
 	{
 		zglCheckOpenGL();
 		if (isInit()) {
-			--m_count;
-			if (isBinded()) unbind();
+			if (isBinded()) unbind(m_target);
 			glDeleteBuffers(1, &m_handle);
+			--m_count;
 		}
 		zglCheckOpenGL();
 	}

@@ -9,6 +9,5 @@
 
 namespace zgl
 {
-	// Implementation functions
-	// ...
+
 } // End namespace zgl

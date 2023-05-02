@@ -16,51 +16,46 @@ namespace zgl
 
 	const glm::vec2* CubeMesh::get2DPositions () const
 	{
+		assert(false); // 3D cube cannot be interpreted has a 2D shape.
 		return NULL;
 	}
 
 	const glm::vec3* CubeMesh::get3DPositions () const
 	{
-		if (m_useIndex) {
-			return NULL;
-		} else {
-			return m_unindexedPos3;
-		}
+		return s_pos3;
 	}
 
 	const glm::vec3* CubeMesh::getRGBColors () const
 	{
+		assert(false);
 		return NULL;
 	}
 
 	const glm::vec3* CubeMesh::getNormals () const
 	{
-		return NULL;
+		return s_normal;
 	}
 
 	const glm::vec2* CubeMesh::getUVcoords () const
 	{
-		return NULL;
+		return s_uv;
 	}
 
-	const size_t* CubeMesh::getIndicies () const
+	const GLuint* CubeMesh::getIndicies () const
 	{
-		return NULL;
+		return s_indices;
 	}
 
 	size_t CubeMesh::getNumberOfVerticies () const
 	{
-		if (m_useIndex) {
-			return m_indexedLenght;
-		} else {
-			return m_unindexedLenght;
-		}
+		assert(m_useIndex);
+		return s_lenght;
 	}
 
 	size_t CubeMesh::getNumberOfIndicies () const
 	{
-		assert(useIndex());
-		return m_unindexedLenght;
+		assert(m_useIndex);
+		return s_lenght;
 	}
 
 	bool CubeMesh::useIndex () const

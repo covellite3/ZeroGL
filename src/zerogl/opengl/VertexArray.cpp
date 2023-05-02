@@ -22,6 +22,9 @@ namespace zgl
 			zglCheckOpenGL();
 			if (isBinded()) unbind();
 			if (isInit()) glDeleteVertexArrays(1, &m_handle);
+			m_handle = 0;
+			m_hasIndex = 0;
+			assert(isInit() == false);
 			zglCheckOpenGL();
 		}
 		
@@ -64,12 +67,23 @@ namespace zgl
 			assert(stride >= 0);
 			assert(isInit());
 			zglCheckOpenGL();
+			bind(*this);
 			ArrayBuffer::bind(vbo);
 			glVertexAttribPointer(index, size, type, normalized, stride, offset);
 			zglCheckOpenGL();
 		}
 
-		//void setElementArrayBuffer ();
+		void VertexArray::setElementArrayBuffer (const ArrayBuffer& elementArrayBuffer)
+		{
+			assert(elementArrayBuffer.getTarget() == GL_ELEMENT_ARRAY_BUFFER);
+			assert(elementArrayBuffer.isInit());
+			zglCheckOpenGL();
+			ArrayBuffer::unbind(GL_ELEMENT_ARRAY_BUFFER);
+			bind(*this);
+			ArrayBuffer::bind(elementArrayBuffer);
+			m_hasIndex = true;
+			zglCheckOpenGL();
+		}
 
 		const VertexArray& VertexArray::bind (const VertexArray& vertexArray)
 		{

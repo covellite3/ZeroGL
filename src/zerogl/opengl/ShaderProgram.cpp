@@ -165,7 +165,13 @@ namespace zgl
 		zglCheckOpenGL();
 		ShaderProgram::bind(*this);
 		VertexArray::bind(vao);
-		glDrawArrays(mode, first, count);
+		//std::cout << __func__ << " " << first << " " << count << std::endl;
+		if (vao.hasIndex()) {
+			glDrawElements(mode, count, GL_UNSIGNED_INT, 0);
+		} else {
+			glDrawArrays(mode, first, first+count);
+		}
+
 		zglCheckOpenGL();	
 	}
 
