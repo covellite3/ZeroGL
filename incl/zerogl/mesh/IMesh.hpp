@@ -28,7 +28,7 @@ namespace zgl
 	protected:
 	public:
 		//typedef enum { TWO_DIM = 2, THREE_DIM = 3 } Dimensions;
-		enum class Dimensions { TWO_DIM = 2, THREE_DIM = 3 };
+		enum class Dimensions { UNKNOW = 0, TWO_DIM = 2, THREE_DIM = 3 };
 
 		IMesh ();
 
@@ -48,7 +48,7 @@ namespace zgl
 		virtual const glm::vec2* getUVcoords () const = 0;
 
 		/** Get array indexing verticies.  */
-		virtual const size_t* getIndicies () const = 0;
+		virtual const GLuint* getIndicies () const = 0;
 
 		/** OpengGL rendering mode: GL_TRIANGLES, GL_POINTS, etc... */
 		//virtual GLenum getRenderingMode ();

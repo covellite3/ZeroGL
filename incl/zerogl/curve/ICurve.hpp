@@ -8,6 +8,7 @@
 #define H_ZGL_ZEROGL_CURVE_ICURVE
 
 // Includes
+#include <cstddef>
 // End includes
 
 namespace zgl
@@ -17,11 +18,20 @@ namespace zgl
 	 * @date: 2023-02-14
 	 * @brief: Curve interface.
 	 */
+	template<typename T>
 	class ICurve
 	{
 	private:
 	protected:
 	public:
+		/** TODO comment */
+		virtual T operator() (const float t) const = 0;
+
+		/** TODO comment */
+		//virtual size_t getNumberOfControlPoints() const;
+
+		/** TODO comment */
+		//virtual const T* getControlPoints () const;
 	}; // End class ICurve
 
 } // End namespace zgl

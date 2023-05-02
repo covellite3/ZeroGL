@@ -27,96 +27,190 @@ namespace zgl
 		bool m_useIndex;
 
 		/** TODO comment */
-		static constexpr size_t m_unindexedLenght = 36;
+		static constexpr size_t s_lenght = 36;
 
 		/** TODO comment */
-		static constexpr glm::vec3 m_unindexedPos3[m_unindexedLenght] = {
-			{-1.0f,-1.0f,-1.0f},
-			{-1.0f,-1.0f, 1.0f},
-			{-1.0f, 1.0f, 1.0f},
-					      
-			{ 1.0f, 1.0f,-1.0f},
+		static constexpr glm::vec3 s_pos3[s_lenght] = {		      
+
+			// Back
 			{-1.0f,-1.0f,-1.0f},
 			{-1.0f, 1.0f,-1.0f},
-					       
-			{ 1.0f,-1.0f, 1.0f},
-			{-1.0f,-1.0f,-1.0f},
-			{ 1.0f,-1.0f,-1.0f},
-
+			{ 1.0f, 1.0f,-1.0f},
 			{ 1.0f, 1.0f,-1.0f},
 			{ 1.0f,-1.0f,-1.0f},
 			{-1.0f,-1.0f,-1.0f},
 
-			{-1.0f,-1.0f,-1.0f},
+			// Front
+			{-1.0f,-1.0f, 1.0f},
+			{-1.0f, 1.0f, 1.0f},
+			{ 1.0f, 1.0f, 1.0f},
+			{ 1.0f, 1.0f, 1.0f},
+			{ 1.0f,-1.0f, 1.0f},
+			{-1.0f,-1.0f, 1.0f},
+
+			// Left
+			{-1.0f,-1.0f, 1.0f},
 			{-1.0f, 1.0f, 1.0f},
 			{-1.0f, 1.0f,-1.0f},
-
-			{ 1.0f,-1.0f, 1.0f},
-			{-1.0f,-1.0f, 1.0f},
+			{-1.0f, 1.0f,-1.0f},
 			{-1.0f,-1.0f,-1.0f},
-
-			{-1.0f, 1.0f, 1.0f},
 			{-1.0f,-1.0f, 1.0f},
+
+			// Right
 			{ 1.0f,-1.0f, 1.0f},
-
-			{1.0f, 1.0f, 1.0f},
-			{1.0f,-1.0f,-1.0f},
-			{1.0f, 1.0f,-1.0f},
-
-			{1.0f,-1.0f,-1.0f},
-			{1.0f, 1.0f, 1.0f},
-			{1.0f,-1.0f, 1.0f},
-
 			{ 1.0f, 1.0f, 1.0f},
 			{ 1.0f, 1.0f,-1.0f},
-			{-1.0f, 1.0f,-1.0f},
+			{ 1.0f, 1.0f,-1.0f},
+			{ 1.0f,-1.0f,-1.0f},
+			{ 1.0f,-1.0f, 1.0f},
 
+			// Top
+			{-1.0f, 1.0f, 1.0f},
 			{ 1.0f, 1.0f, 1.0f},
 			{-1.0f, 1.0f,-1.0f},
-			{-1.0f, 1.0f, 1.0f},
-
+			{-1.0f, 1.0f,-1.0f},
+			{ 1.0f, 1.0f,-1.0f},
 			{ 1.0f, 1.0f, 1.0f},
-			{-1.0f, 1.0f, 1.0f},
-			{ 1.0f,-1.0f, 1.0f}
+
+			// Bottom
+			{-1.0f, -1.0f, 1.0f},
+			{ 1.0f, -1.0f, 1.0f},
+			{-1.0f, -1.0f,-1.0f},
+			{-1.0f, -1.0f,-1.0f},
+			{ 1.0f, -1.0f,-1.0f},
+			{ 1.0f, -1.0f, 1.0f}
+
 		};
 
-		static constexpr size_t m_indexedLenght = 8;
+		static constexpr glm::vec3 s_normal[s_lenght] = {
+			
+  			// Back			
+			{ 0.0f,  0.0f, -1.0f},
+			{ 0.0f,  0.0f, -1.0f},
+			{ 0.0f,  0.0f, -1.0f},
 
-		static constexpr glm::vec3 m_indexedPos3[m_indexedLenght] = {
-			{ -1.0f, -1.0f,  1.0f },
-			{  1.0f, -1.0f,  1.0f },
-			{ -1.0f,  1.0f,  1.0f },
-			{  1.0f,  1.0f,  1.0f },
-			{ -1.0f, -1.0f, -1.0f },
-			{  1.0f, -1.0f, -1.0f },
-			{ -1.0f,  1.0f, -1.0f },
-			{  1.0f,  1.0f, -1.0f } 
+			{ 0.0f,  0.0f, -1.0f},
+			{ 0.0f,  0.0f, -1.0f},
+			{ 0.0f,  0.0f, -1.0f},
+
+			// Front
+			{ 0.0f,  0.0f,  1.0f},
+			{ 0.0f,  0.0f,  1.0f},
+			{ 0.0f,  0.0f,  1.0f},
+
+			{ 0.0f,  0.0f,  1.0f},
+			{ 0.0f,  0.0f,  1.0f},
+			{ 0.0f,  0.0f,  1.0f},
+
+			// Left
+			{-1.0f,  0.0f,  0.0f},
+			{-1.0f,  0.0f,  0.0f},
+			{-1.0f,  0.0f,  0.0f},
+
+			{-1.0f,  0.0f,  0.0f},
+			{-1.0f,  0.0f,  0.0f},
+			{-1.0f,  0.0f,  0.0f},
+
+			// Right
+			{ 1.0f,  0.0f,  0.0f},
+			{ 1.0f,  0.0f,  0.0f},
+			{ 1.0f,  0.0f,  0.0f},
+
+			{ 1.0f,  0.0f,  0.0f},
+			{ 1.0f,  0.0f,  0.0f},
+			{ 1.0f,  0.0f,  0.0f},
+
+			// Top
+			{ 0.0f,  1.0f,  0.0f},
+			{ 0.0f,  1.0f,  0.0f},
+			{ 0.0f,  1.0f,  0.0f},
+
+			{ 0.0f,  1.0f,  0.0f},
+			{ 0.0f,  1.0f,  0.0f},
+			{ 0.0f,  1.0f,  0.0f},
+
+			// Bottom
+			{ 0.0f, -1.0f,  0.0f},
+			{ 0.0f, -1.0f,  0.0f},
+			{ 0.0f, -1.0f,  0.0f},
+
+			{ 0.0f, -1.0f,  0.0f},
+			{ 0.0f, -1.0f,  0.0f},
+			{ 0.0f, -1.0f,  0.0f}
 		};
 
-		static constexpr GLuint m_indices[m_unindexedLenght] = {
-			//Top
-			2, 6, 7,
-			2, 3, 7,
+		static constexpr glm::vec2 s_uv[s_lenght] = {		      
 
-			//Bottom
-			0, 4, 5,
-			0, 1, 5,
+			// Back
+			{ 0.0f, 0.0f},
+			{ 0.0f, 1.0f},
+			{ 1.0f, 1.0f},
+			{ 0.0f, 0.0f},
+			{ 1.0f, 0.0f},
+			{ 1.0f, 1.0f},
 
-			//Left
-			0, 2, 6,
-			0, 4, 6,
+			// Front
+			{ 0.0f, 0.0f},
+			{ 0.0f, 1.0f},
+			{ 1.0f, 1.0f},
+			{ 0.0f, 0.0f},
+			{ 1.0f, 0.0f},
+			{ 1.0f, 1.0f},
 
-			//Right
-			1, 3, 7,
-			1, 5, 7,
+			// Left
+			{ 0.0f, 0.0f},
+			{ 0.0f, 1.0f},
+			{ 1.0f, 1.0f},
+			{ 0.0f, 0.0f},
+			{ 1.0f, 0.0f},
+			{ 1.0f, 1.0f},
 
-			//Front
-			0, 2, 3,
-			0, 1, 3,
+			// Right
+			{ 0.0f, 0.0f},
+			{ 0.0f, 1.0f},
+			{ 1.0f, 1.0f},
+			{ 0.0f, 0.0f},
+			{ 1.0f, 0.0f},
+			{ 1.0f, 1.0f},
 
-			//Back
-			4, 6, 7,
-			4, 5, 7
+			// TOP
+			{ 0.0f, 0.0f},
+			{ 0.0f, 1.0f},
+			{ 1.0f, 1.0f},
+			{ 0.0f, 0.0f},
+			{ 1.0f, 0.0f},
+			{ 1.0f, 1.0f},
+	
+
+			// Bottom
+			{ 0.0f, 0.0f},
+			{ 0.0f, 1.0f},
+			{ 1.0f, 1.0f},
+			{ 0.0f, 0.0f},
+			{ 1.0f, 0.0f},
+			{ 1.0f, 1.0f}
+		};
+
+
+
+		static constexpr GLuint s_indices[s_lenght] = {
+			 0,  1,  2,
+			 3,  4,  5,
+
+			 6,  7,  8,
+			 9, 10, 11,
+
+			12, 13, 14, 
+			15, 16, 17,
+		       
+			18, 19, 20,	
+			21, 22, 23,
+
+			24, 25, 26,
+			27, 28, 29,
+		       	
+			30, 31,	32,
+		       	33, 34, 35
 		};
 	protected:
 	public:
@@ -128,9 +222,10 @@ namespace zgl
 		const glm::vec3* getRGBColors () const;
 		const glm::vec3* getNormals () const;
 		const glm::vec2* getUVcoords () const;
-		const size_t* getIndicies () const;
+		const GLuint* getIndicies () const;
 		//GLenum getRenderingMode () const;
-		size_t getLenght () const;
+		size_t getNumberOfVerticies () const;
+		size_t getNumberOfIndicies () const;
 		bool useIndex () const;
 		Dimensions getDim () const;
 

@@ -67,6 +67,8 @@ namespace zgl
 			glUniformMatrix3fv(location, 1, transpose, glm::value_ptr(uniform));
 		else if constexpr (std::is_same<T, glm::mat4>::value)
 			glUniformMatrix4fv(location, 1, transpose, glm::value_ptr(uniform));
+		else if constexpr (std::is_same<T, glm::vec3>::value)
+			glUniform3fv(location, 1, glm::value_ptr(uniform));
 		else
 			static_assert("Uniform type not supported by template.");
 		zglCheckOpenGL();

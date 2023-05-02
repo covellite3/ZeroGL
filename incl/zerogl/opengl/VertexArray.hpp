@@ -28,6 +28,10 @@ namespace zgl
 
 		/** TODO comment */
 		GLuint m_handle;
+
+		/** TODO comment */
+		bool m_hasIndex;
+
 	protected:
 	public:
 		/** TODO comment */
@@ -58,14 +62,20 @@ namespace zgl
 				const void* offset,
 				const ArrayBuffer& vbo);
 
+
+		void setElementArrayBuffer (const ArrayBuffer& elementArrayBuffer);
+
 		/** TODO comment */
 		//void setElementArrayBuffer ();
 
 		/** TODO comment */
-		inline bool isInit () { return m_handle != 0; }
+		inline bool isInit () const { return m_handle != 0; }
 
 		/** TODO comment */
-		inline bool isBinded () { return m_handleBinded == m_handle; }
+		inline bool isBinded () const { return m_handleBinded == m_handle; }
+
+		/** TODO comment */
+		inline bool hasIndex () const { return m_hasIndex; }
 
 		/** TODO comment */
 		static const VertexArray& bind (const VertexArray& vertexArray);
