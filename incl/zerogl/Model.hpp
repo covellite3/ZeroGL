@@ -1,6 +1,6 @@
 /**
- * @author: Corentin Asso
- * @date: 2023-03-31
+ * @author: Asso Corentin
+ * @date: 2025-02-21
  * @brief: Header for class 'zerogl.Model'.
  */
 
@@ -8,21 +8,22 @@
 #define H_ZGL_ZEROGL_MODEL
 
 // Includes
-#include "zerogl/IModel.hpp"
+#include "zerogl/Mesh.hpp"
 // End includes
 
 namespace zgl
 {
 	/**
-	 * @author: Corentin Asso
-	 * @date: 2023-03-31
-	 * @brief: Model class.
+	 * @author: Asso Corentin
+	 * @date: 2025-02-21
+	 * @brief: TODO.
 	 */
-	class Model : public IModel
+	class Model
 	{
+	private:
+	protected:
 	public:
-		Model();
-		void init(const IMesh& mesh);
+		Model(const Mesh& mesh);
 	}; // End class Model
 
 } // End namespace zgl

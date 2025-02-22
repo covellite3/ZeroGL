@@ -6,8 +6,9 @@
  
 namespace zgl
 {
-	inline const ShaderProgram& ShaderProgram::bind (const ShaderProgram& shaderProgram)
+	inline const ShaderProgram& ShaderProgram::bind(const ShaderProgram& shaderProgram)
 	{
+		assert(shaderProgram.m_handle != 0);
 		assert(shaderProgram.isInit());
 		zglCheckOpenGL();
 		m_handleBinded = shaderProgram.m_handle;
@@ -16,7 +17,7 @@ namespace zgl
 		return shaderProgram;
 	}
 
-	inline void ShaderProgram::unbind ()
+	inline void ShaderProgram::unbind()
 	{
 		zglCheckOpenGL();
 		m_handleBinded = 0;

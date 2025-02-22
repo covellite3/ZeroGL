@@ -49,7 +49,10 @@ set(TOOLS_DIR "tools")	# Directory for developers tool in the forme of scriptes.
 ###########################
 ### COMPILATION OPTIONS ###
 ###########################
-add_compile_options(-Wall -Wextra -pedantic -Werror)
+#add_compile_options(-Wall -Wextra -pedantic -Werror)
+#add_compile_options(-g -Wall -Wextra -pedantic -Werror -Wconversion -Wuninitialized)
+add_compile_options(-g -Wall -Wextra -pedantic -Werror -Wconversion -Wshadow -Wuninitialized)
+#add_compile_options(-Wall -Wextra -pedantic -Werror -Wconversion -Wshadow -Wuninitialized -Wno-unused-parameter)
 
 
 ##############
@@ -138,16 +141,18 @@ message(STATUS "")
 ################
 # List of binaries names
 set(LIST_BIN_NAMES
-	unittest
-	example
+	#unittest
+	#example
 	#example_cube
+	debug
 )
 # Subdirectories starting from SRC_DIR containing
 # the sources files with 'main.cpp' for each
 # executables (binaries).
 set(unittest_MAIN_PATH test)
 set(example_MAIN_PATH example1)
-#set(example_cube_MAIN_PATH example2)
+set(example_cube_MAIN_PATH example2)
+set(debug_MAIN_PATH example3)
 foreach(BIN_NAME ${LIST_BIN_NAMES})
 	##############
 	### BINARY ###
@@ -187,7 +192,7 @@ foreach(BIN_NAME ${LIST_BIN_NAMES})
 	##########################
 	add_executable(${BIN_NAME} ${SRCS})
 	target_link_libraries(${BIN_NAME} ${LIBRARIES})
-	set_target_properties(${BIN_NAME} PROPERTIES CXX_STANDARD 17)
+	set_target_properties(${BIN_NAME} PROPERTIES CXX_STANDARD 20)
 	set_target_properties(${BIN_NAME}
 	    PROPERTIES
 	    ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/${LIB_DIR}"

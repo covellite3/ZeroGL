@@ -26,7 +26,7 @@ namespace zgl
 
 	float bernsteinPolynomial(int n, int i, float t)
 	{
-		float a = binomialCoeff(n, i);
+		float a = (float)binomialCoeff(n, i);
 		float b = std::pow((float)t, (float)i);
 		float c =  std::pow(1.0f-t, (float)(n-i));
 		return a*b*c;

@@ -15,6 +15,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 // End includes
 
 /*
@@ -43,7 +44,7 @@ namespace zgl
 	protected:
 	public:
 		/** Turn an GLenum into a string of the same name. */
-		static inline const char* toStringEnum(GLenum e);
+		static std::string toStringEnum(const GLenum e);
 
 		/**
 		 * Print out error(s) in the OpenGL's error queue.
@@ -60,7 +61,5 @@ namespace zgl
 
 // Import other headers in package
 #include "zerogl/opengl/ShaderProgram.hpp"
-#include "zerogl/opengl/ArrayBuffer.hpp"
-#include "zerogl/opengl/VertexArray.hpp"
 
 #endif // H_ZGL_ZEROGL_OPENGL_OPENGL

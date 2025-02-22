@@ -9,6 +9,7 @@
 
 // Includes
 #include "zerogl/ZeroGL.hpp"
+#include <string>
 #include <ostream>
 #include <sstream>
 #include <stdexcept>
@@ -48,6 +49,8 @@ namespace zgl
 		/** TODO comment */
 		enum Status m_status;
 
+		/** Read text file into a stringstream. */
+		void _readFile(std::stringstream& ss, const std::string& filepath);
 		/** TODO comment */
 		static size_t _mapEnumToIndex (GLenum enumShader);
 
@@ -67,78 +70,78 @@ namespace zgl
 
 	public:
 		/** TODO comment */
-		ShaderProgram ();
+		ShaderProgram();
 
 		/** TODO comment */
-		~ShaderProgram ();
+		~ShaderProgram();
 
 		/** TODO comment */
-		void init ();
+		void init();
 	
 		/** TODO comment */
-		bool compile ();
+		bool compile();
 
 		/** TODO comment */
-		bool link ();
+		bool link();
 
 		/** TODO comment */
-		void showErrors (std::ostream& output);
+		void showErrors(std::ostream& output);
 
 		/** TODO comment */
-		size_t loadTextFile (std::stringstream& outputText, const char* p_rootfolder, const char* p_localpath);
+		void loadFromFile(const GLenum e, const std::string& filepath);
 
 		/** Attach a shader of given GLenum to the program. */
-		void attachShader (const GLenum e, const GLchar* p_src);
+		void attachShader(const GLenum e, const GLchar* p_src);
 
 		/** TODO comment */
-		inline void attachComputeShader (const GLchar* p_src) { attachShader(GL_COMPUTE_SHADER, p_src); }
+		inline void attachComputeShader(const GLchar* p_src) { attachShader(GL_COMPUTE_SHADER, p_src); }
 
 		/** TODO comment */
-		inline void attachVertexShader (const GLchar* p_src) { attachShader(GL_VERTEX_SHADER, p_src); }
+		inline void attachVertexShader(const GLchar* p_src) { attachShader(GL_VERTEX_SHADER, p_src); }
 
 		/** TODO comment */
-		inline void attachTessControleShader (const GLchar* p_src) { attachShader(GL_TESS_CONTROL_SHADER, p_src); }
+		inline void attachTessControleShader(const GLchar* p_src) { attachShader(GL_TESS_CONTROL_SHADER, p_src); }
 
 		/** TODO comment */
-		inline void attachTessEvaluationShader (const GLchar* p_src) { attachShader(GL_TESS_EVALUATION_SHADER, p_src); }
+		inline void attachTessEvaluationShader(const GLchar* p_src) { attachShader(GL_TESS_EVALUATION_SHADER, p_src); }
 
 		/** TODO comment */
-		inline void attachGeometryShade (const GLchar* p_src) { attachShader(GL_GEOMETRY_SHADER, p_src); }
+		inline void attachGeometryShade(const GLchar* p_src) { attachShader(GL_GEOMETRY_SHADER, p_src); }
 
 		/** TODO comment */
-		inline void attachFragmentShader (const GLchar* p_src) { attachShader(GL_FRAGMENT_SHADER, p_src); }
+		inline void attachFragmentShader(const GLchar* p_src) { attachShader(GL_FRAGMENT_SHADER, p_src); }
 
 		/**
 		 * Before linking.
 		 * TODO comment
 		 */
-		void bindAttribLocation (GLuint index, const GLchar* name);
+		void bindAttribLocation(GLuint index, const GLchar* name);
 
 		/**
 		 * Before linking.
 		 * TODO comment
 		 */
 		template<typename... Args>
-		void setOutputFragment (Args... args);
+		void setOutputFragment(Args... args);
 
 		/**
 		 * Before linking.
 		 * TODO comment
 		 */
-		//void setTransformFeedbackOutputCapturing ();
+		//void setTransformFeedbackOutputCapturing();
 
 		/**
 		 * Before linking.
 		 * TODO comment
 		 */
-		//void programSeparation ();
+		//void programSeparation();
 
 		/** TODO comment */
-		GLuint getUniformLocation (const GLchar* name);
+		GLuint getUniformLocation(const GLchar* name);
 
 		/** TODO comment */
 		template<typename T>
-		void setUniform (GLuint location, const T& uniform, GLboolean transpose=GL_FALSE);
+		void setUniform(GLuint location, const T& uniform, GLboolean transpose=GL_FALSE);
 
 		/** TODO comment */
 		//template<typename T>
@@ -148,22 +151,19 @@ namespace zgl
 		//void attachLibrary (const LibraryGLSL& lib);
 		
 		/** TODO comment */
-		inline bool isInit () const { return m_handle != 0; };
+		inline bool isInit() const { return m_handle != 0; };
 
 		/** TODO comment */
-		inline bool isBinded () const { return m_handleBinded == m_handle; };
+		inline bool isBinded() const { return m_handleBinded == m_handle; };
 
 		/** TODO comment */
-		inline bool getHandle () { return m_handle; };
+		inline bool getHandle() { return m_handle; };
 
 		/** TODO comment */
-		void draw(const VertexArray& vao, GLenum mode, GLint first, GLsizei count);
+		static inline const ShaderProgram& bind(const ShaderProgram& shaderProgram);
 
 		/** TODO comment */
-		static inline const ShaderProgram& bind (const ShaderProgram& shaderProgram);
-
-		/** TODO comment */
-		static inline void unbind ();
+		static inline void unbind();
 
 	}; // End class ShaderProgram
 

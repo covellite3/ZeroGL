@@ -19,5 +19,6 @@ void main()
         normal = (normalMat*vec4(a_normal, 1.0f)).xyz;
         uv = a_uv;
         gl_Position = modelViewProjMat * vec4(a_position, 1.0f);
+        //gl_Position = vec4(a_position, 1.0f);
 }
 

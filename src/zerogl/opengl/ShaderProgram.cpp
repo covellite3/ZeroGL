@@ -6,7 +6,6 @@
  
 // Import header file.
 #include "zerogl/opengl/ShaderProgram.hpp"
-
 #include <fstream>
 
 namespace zgl
@@ -107,20 +106,26 @@ namespace zgl
 		}		
 	}
 
-	/*size_t ShaderProgram::loadTextFile (std::stringstream& outputText, const char* p_rootfolder, const char* p_localpath)
-	{
-		char buffer[512];
-		size_t nbytes = 0;
-		std::fstream file(std::string(p_rootfolder)+std::string(p_localpath));
-		while (!file.eof()) {
-			getline(buffer, sizeof(buffer)*sizeof(char));
-			//if (isPreprocessorInclude(buffer))
-			//	includePreprocessor(outputText, buffer, sizeof(buffer));
-			outputText << buffer;
+	void ShaderProgram::_readFile(std::stringstream& ss, const std::string& filepath) {
+		char buffer[256];
+		std::ifstream ifs;
+		ifs.open(filepath, std::ios::in);
+		while (!ifs.eof()) {
+			ifs.read(buffer, sizeof(buffer)-1);
+			auto count =  ifs.gcount();
+			buffer[count] = '\0';
+			ss << buffer;
 		}
-		file.close();
-		return nbytes;
-	}*/
+		ifs.close();
+	}
+
+
+	void ShaderProgram::loadFromFile(const GLenum e, const std::string& filepath)
+	{
+		std::stringstream ss;
+		_readFile(ss, filepath);
+		attachShader(e, ss.str().c_str());
+	}
 
 	void ShaderProgram::attachShader (const GLenum e, const GLchar* p_src)
 	{
@@ -158,22 +163,6 @@ namespace zgl
 		return location;
 	}
 
-	void ShaderProgram::draw(const VertexArray& vao, GLenum mode, GLint first, GLsizei count)
-	{
-		assert(isInit());
-		assert(m_status == LINKED);
-		zglCheckOpenGL();
-		ShaderProgram::bind(*this);
-		VertexArray::bind(vao);
-		//std::cout << __func__ << " " << first << " " << count << std::endl;
-		if (vao.hasIndex()) {
-			glDrawElements(mode, count, GL_UNSIGNED_INT, 0);
-		} else {
-			glDrawArrays(mode, first, first+count);
-		}
-
-		zglCheckOpenGL();	
-	}
 
 	size_t ShaderProgram::_mapEnumToIndex (GLenum enumShader)
 	{

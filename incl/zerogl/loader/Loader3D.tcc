@@ -1,7 +1,7 @@
 /**
- * @author: Corentin Asso
- * @date: 2023-02-14
- * @brief: Template file for class 'zerogl.Camera'.
+ * @author: Asso Corentin
+ * @date: 2025-02-21
+ * @brief: Template file for class 'zerogl.loader.Loader3D'.
  */
  
 namespace zgl
