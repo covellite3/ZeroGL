@@ -57,7 +57,7 @@ namespace zgl
 	}
 
 	template<typename T>
-	void ShaderProgram::setUniform (GLuint location, const T& uniform, GLboolean transpose)
+	void ShaderProgram::setUniformMatrix(const GLuint location, const T& uniform, GLboolean transpose)
 	{
 		assert(m_status == LINKED);
 		zglCheckOpenGL();
@@ -72,6 +72,29 @@ namespace zgl
 			glUniform3fv(location, 1, glm::value_ptr(uniform));
 		else
 			static_assert("Uniform type not supported by template.");
+		zglCheckOpenGL();
+	}
+
+	template<typename T>
+	void ShaderProgram::setUniformTexture(const GLuint location, const T& texture, size_t unit)
+	{
+		assert(m_status == LINKED);
+		assert(unit < GL_MAX_TEXTURE_UNITS);
+		zglCheckOpenGL();
+		bind(*this);
+
+		glActiveTexture(OpenGL::mapTextureUnit(unit));
+		zglCheckOpenGL();
+		if constexpr (std::is_same<T, sf::Texture>::value) {
+			sf::Texture::bind(&texture);
+			zglCheckOpenGL();
+		} else if constexpr (std::numeric_limits<T>::is_integer) {
+			glBindTexture(GL_TEXTURE_2D, texture);
+			zglCheckOpenGL();
+		} else {
+			static_assert("Uniform texture type not supported by template.");
+		}
+		glUniform1i(location, static_cast<GLuint>(unit));
 		zglCheckOpenGL();
 	}
 

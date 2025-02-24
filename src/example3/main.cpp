@@ -9,11 +9,13 @@
 
 #include <SFML/OpenGL.hpp>
 #include <SFML/Window.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics.hpp>
 
 using namespace zgl;
 
 sf::Window window;
+sf::Texture texture;
 ShaderProgram shaderProgram;
 Mesh mesh;
 int width = 0, height = 0;
@@ -66,6 +68,11 @@ void init()
 		exit(EXIT_FAILURE);
 	}
 
+	if (!texture.loadFromFile("assets/textures/tex1.png")) {
+		std::cerr << "Could no load image" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
 	std::cout << "[MAIN] Done init" << std::endl;
 }
 
@@ -85,23 +92,23 @@ inline void pipeline ()
 	glm::mat4 projMat = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.1f, 100.0f);
 
 	auto loc = shaderProgram.getUniformLocation("u_modelMat");
-	shaderProgram.setUniform(loc, modelMat);
+	shaderProgram.setUniformMatrix(loc, modelMat);
 
 	loc = shaderProgram.getUniformLocation("u_viewMat");
-	shaderProgram.setUniform(loc, viewMat);
+	shaderProgram.setUniformMatrix(loc, viewMat);
 
 	loc = shaderProgram.getUniformLocation("u_projMat");
-	shaderProgram.setUniform(loc, projMat);
+	shaderProgram.setUniformMatrix(loc, projMat);
 
 	loc = shaderProgram.getUniformLocation("u_lightVector");
 	glm::vec3 lightVector = glm::normalize(glm::vec3(1.0f, -1.0f, -1.0f));
-	shaderProgram.setUniform(loc, lightVector);
+	shaderProgram.setUniformMatrix(loc, lightVector);
+
+	loc = shaderProgram.getUniformLocation("u_tex");
+	shaderProgram.setUniformTexture(loc, texture, 0);
 
 	mesh.draw(shaderProgram);
-	zglCheckOpenGL();
 	
-
-
 	foo += 0.01f;
 }
 

@@ -9,6 +9,7 @@
 
 // Includes
 #include "zerogl/ZeroGL.hpp"
+#include <SFML/Graphics/Texture.hpp>
 #include <string>
 #include <ostream>
 #include <sstream>
@@ -141,7 +142,11 @@ namespace zgl
 
 		/** TODO comment */
 		template<typename T>
-		void setUniform(GLuint location, const T& uniform, GLboolean transpose=GL_FALSE);
+		void setUniformMatrix(const GLuint location, const T& uniform, GLboolean transpose=GL_FALSE);
+
+		/** TODO comment */
+		template<typename T>
+		void setUniformTexture(const GLuint location, const T& texture, size_t unit);
 
 		/** TODO comment */
 		//template<typename T>

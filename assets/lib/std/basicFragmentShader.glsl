@@ -14,10 +14,10 @@ void main()
         float lum = 0;
 	lum = max(dot(-u_lightVector, normal), ambiant);
 	vec3 color = texture(u_tex, vec2(uv.x , 1.0-uv.y)).xyz;
-        //FragColor = vec4(color*lum, 1.0f);
+        FragColor = vec4(color*lum, 1.0f);
         //FragColor = vec4(vec3(uv, 1.0f)*lum, 1.0f);
         //FragColor = vec4(vec3(normal)*lum, 1.0f);
-        FragColor = vec4(vec3(1.0f), 1.0f);
+        //FragColor = vec4(vec3(1.0f), 1.0f);
 }
 
 

@@ -8,7 +8,10 @@
 #define H_ZGL_ZEROGL_MODEL
 
 // Includes
+#include "zerogl/Entity.hpp"
 #include "zerogl/Mesh.hpp"
+#include "zerogl/Material.hpp"
+#include "zerogl/Skeleton.hpp"
 // End includes
 
 namespace zgl
@@ -18,12 +21,16 @@ namespace zgl
 	 * @date: 2025-02-21
 	 * @brief: TODO.
 	 */
-	class Model
+	template<size_t DIMENSION=3>
+	class Model : Entity<DIMENSION>
 	{
 	private:
+		Mesh m_mesh;
+		Material m_material;
+		Skeleton m_skeleton;
 	protected:
 	public:
-		Model(const Mesh& mesh);
+		Model(Mesh&& t_mesh, Material&& t_material, Skeleton&& m_Skeleton);
 	}; // End class Model
 
 } // End namespace zgl

@@ -23,7 +23,7 @@
  */
 #ifndef NDEBUG
 	/** TODO comment */
-	#define zglCheckOpenGL() zgl::OpenGL::checkError(__FILE__, __func__, __LINE__);
+	#define zglCheckOpenGL() zgl::OpenGL::checkError(__FILE__, __func__, __LINE__)
 #else
 	/** TODO comment */
 	#define zglCheckOpenGL() {}
@@ -45,6 +45,17 @@ namespace zgl
 	public:
 		/** Turn an GLenum into a string of the same name. */
 		static std::string toStringEnum(const GLenum e);
+
+
+		/**
+		 * Get OpenGL correct enum for unit texture:
+		 * 0->GL_TEXTURE0,
+		 * 1->GL_TEXTURE1,
+		 * 2->GL_TEXTURE2,
+		 * ...
+		 * 31->GL_TEXTURE31
+		 * */
+		static GLenum mapTextureUnit(size_t unit);
 
 		/**
 		 * Print out error(s) in the OpenGL's error queue.
