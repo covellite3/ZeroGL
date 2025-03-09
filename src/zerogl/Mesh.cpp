@@ -18,7 +18,7 @@ namespace zgl
 	Mesh::~Mesh()
 	{
 		if(this->isInit()) {
-			std::cout << "[Mesh - ] Delete Mesh" << std::endl;
+			std::cout << "[Mesh - ] Delete init Mesh" << std::endl;
 		} else {
 			std::cout << "[Mesh - ] Delete Mesh, but it was empty ;)" << std::endl;
 		}
@@ -48,6 +48,14 @@ namespace zgl
 		this->m_useIndex = other.m_useIndex;
 		this->m_nAttributes = other.m_nAttributes;
 		this->m_count = other.m_count;
+
+		// Cleanup
+		other.m_vbo = 0;
+		other.m_ebo = 0;
+		other.m_vao = 0;
+		other.m_useIndex = false;
+		other.m_nAttributes = 0;
+		other.m_count = 0;
 	}
 
 

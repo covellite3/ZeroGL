@@ -10,7 +10,7 @@ uniform sampler2D u_tex;
 
 void main()
 {
-	float ambiant = 0.3f;
+	float ambiant = 0.0f;
         float lum = 0;
 	lum = max(dot(-u_lightVector, normal), ambiant);
 	vec3 color = texture(u_tex, vec2(uv.x , 1.0-uv.y)).xyz;

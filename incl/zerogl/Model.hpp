@@ -12,6 +12,8 @@
 #include "zerogl/Mesh.hpp"
 #include "zerogl/Material.hpp"
 #include "zerogl/Skeleton.hpp"
+
+#include <memory>
 // End includes
 
 namespace zgl
@@ -21,16 +23,25 @@ namespace zgl
 	 * @date: 2025-02-21
 	 * @brief: TODO.
 	 */
-	template<size_t DIMENSION=3>
-	class Model : Entity<DIMENSION>
+	class Model : public Component
 	{
 	private:
-		Mesh m_mesh;
-		Material m_material;
-		Skeleton m_skeleton;
+		std::shared_ptr<Mesh> m_mesh;
+		std::shared_ptr<sf::Texture> m_texture;
+		//Material m_material;
+		//Skeleton m_skeleton;
 	protected:
 	public:
-		Model(Mesh&& t_mesh, Material&& t_material, Skeleton&& m_Skeleton);
+		inline Model(): m_mesh(nullptr), m_texture(nullptr) {}
+
+		inline auto& getMesh() { return *m_mesh.get(); }
+		inline void setMesh(std::shared_ptr<Mesh>& t_mesh) { m_mesh = t_mesh; }
+
+
+		inline auto& getTexture() { return *m_texture.get(); }
+		inline void setTexture(std::shared_ptr<sf::Texture>& t_texture) { m_texture = t_texture; }
+		
+		//Model(Mesh&& t_mesh, Material&& t_material, Skeleton&& m_Skeleton);
 	}; // End class Model
 
 } // End namespace zgl
