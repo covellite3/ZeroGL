@@ -39,24 +39,35 @@ namespace zgl
 		/// Send
 		///
 
+
 		/** Send an VBO or an EBO to GPU */
 		template <typename T>
 		static inline void _sendVboEbo(GLuint vbo_or_ebo, GLenum target, const size_t size, const T* p_buffer)
 		{
 			assert(target == GL_ARRAY_BUFFER || target == GL_ELEMENT_ARRAY_BUFFER);
 
+			std::cout << "[_sendVboEbo] Binding buffer: Target=" << target 
+				  << ", VBO/EBO=" << vbo_or_ebo 
+				  << ", Type=" << typeid(T).name() << std::endl;
 			glBindBuffer(target, vbo_or_ebo);
 			zglCheckOpenGL();
-			glBufferData(target, size*sizeof(T), p_buffer, GL_STATIC_DRAW);
+
+			std::cout << "[_sendVboEbo] Uploading data: Size=" << size 
+				  << ", Type size=" << sizeof(T) 
+				  << ", Type=" << typeid(T).name() << std::endl;
+			glBufferData(target, size * sizeof(T), p_buffer, GL_STATIC_DRAW);
+
+			std::cout << "[_sendVboEbo] Buffer uploaded successfully." << std::endl;
 			zglCheckOpenGL();
 		}
+
 
 		//
 		// Attributes
 		//
 
 		/** For each attribute. */
-		template <size_t attribNumber, typename T>
+		/*template <size_t attribNumber, typename T>
 		inline void _setInfoAttrib(const size_t stride, const size_t nComponents)
 		{
 			static_assert(std::is_arithmetic<T>::value, "Wrong attribute type, not supported by OpengGL.");
@@ -75,16 +86,16 @@ namespace zgl
 			zglCheckOpenGL();
 			glEnableVertexAttribArray(attribNumber);
 			zglCheckOpenGL();
-		}
+		}*/
 
-		template <size_t IT, typename T, typename... Args>
+		/*template <size_t IT, typename T, typename... Args>
 		inline void _forEach([[maybe_unused]] const size_t stride, const std::span<T>& index, Args... args)
 		{
 			static_assert(sizeof...(args) == 0, "No more arguments after index.");
 			_sendVboEbo<T>(this->m_ebo, GL_ELEMENT_ARRAY_BUFFER, index.size(), index.data());
-		}
+		}*/
 
-		template <size_t IT, typename T, typename... Args>
+		/*template <size_t IT, typename T, typename... Args>
 		inline void _forEach(const size_t stride, size_t nComponents, [[maybe_unused]] const std::span<T>& attrib, Args... args)
 		{
 			if constexpr(sizeof...(args) <= 0) {
@@ -93,38 +104,38 @@ namespace zgl
 				_setInfoAttrib<IT, T>(stride, nComponents);
 				_forEach<IT+1>(stride, args...);
 			}
-		}
+		}*/
 
 		///
 		/// Stride
 		///
 		/** For each attrib */
-		template <typename T, typename... Args>
+		/*template <typename T, typename... Args>
 		size_t _getStride(const size_t nComponents, [[maybe_unused]] const std::span<T>& attrib, Args... args)
 		{
 			if constexpr(sizeof...(args) <= 1)
 				return 0;
 			else
 				return sizeof(T)*nComponents + _getStride<>(args...); 
-		}
+		}*/
 
 		///
 		/// Buffer size
 		///
-		template <typename T, typename... Args>
+		/*template <typename T, typename... Args>
 		size_t _getBufferSize([[maybe_unused]] const size_t nComponents, const std::span<T>& attrib, Args... args)
 		{
 			if constexpr(sizeof...(args) <= 1)
 				return 0;
 			else
 				return sizeof(T)*attrib.size() + _getBufferSize<>(args...);
-		}
+		}*/
 
 		///
 		/// Interwine
 		///
 		/** For each attribute */
-		template <typename T, typename... Args>
+		/*template <typename T, typename... Args>
 		void _interwine(size_t offset, std::vector<uint8_t>& buffer, const size_t stride, const size_t nComponents, const std::span<T>& attrib, Args... args)
 		{
 			assert(attrib.size()%nComponents == 0); // Attribute is a multiple of the number of components
@@ -140,7 +151,7 @@ namespace zgl
 
 
 
-		}
+		}*/
 
 	protected:
 	public:
@@ -155,7 +166,9 @@ namespace zgl
 
 		void init(uint8_t t_nAttributes, bool t_useIndex);
 
-		template <typename T, typename... Args>
+		void send(const std::span<float>& position, const std::span<float>& normal, const std::span<float>& uv, const std::span<IndexType>& indices);
+
+		/*template <typename T, typename... Args>
 		inline void send(const size_t nComponents, const std::span<T>& attrib, Args... args)
 		{
 			std::cout << "[Mesh ->] Mesh is sending attribute(s) " << (this->hasIndex() ? "and index" : "") << " to GPU" << std::endl;
@@ -178,14 +191,8 @@ namespace zgl
 				<< " and count of "
 				<< m_count
 				<< std::endl;
-		}
-
-
-		/*template <typename T, size_t N, typename... Args>
-		void send(size_t nComponents, const std::array<T, N>& attrib, Args... args) {
-			//send(nComponents, std::span<T>(attrib), std::forward<Args>(args)...);
-			send(nComponents, std::span<T>(attrib), args...);
 		}*/
+
 
 
 

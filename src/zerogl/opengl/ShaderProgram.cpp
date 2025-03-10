@@ -107,23 +107,30 @@ namespace zgl
 	}
 
 	void ShaderProgram::_readFile(std::stringstream& ss, const std::string& filepath) {
-		char buffer[256];
-		std::ifstream ifs;
-		ifs.open(filepath, std::ios::in);
-		while (!ifs.eof()) {
-			ifs.read(buffer, sizeof(buffer)-1);
-			auto count =  ifs.gcount();
-			buffer[count] = '\0';
-			ss << buffer;
-		}
-		ifs.close();
-	}
+		std::ifstream ifs(filepath);
+		if (!ifs.is_open()) return;
 
+		std::string line;
+		while (std::getline(ifs, line)) {
+			if (line.substr(0, 8) == "#include") {
+				// Extract the path between <> after #include)
+				size_t startPos = line.find_first_of('<') + 1;
+				size_t endPos = line.find_last_of('>');
+				if (startPos != std::string::npos && endPos != std::string::npos) {
+					std::string includePath = line.substr(startPos, endPos - startPos);
+					_readFile(ss, includePath);  // Recursively read the included file
+				}
+			} else {
+				ss << line << "\n";  // Append the line to the stringstream
+			}
+		}
+	}
 
 	void ShaderProgram::loadFromFile(const GLenum e, const std::string& filepath)
 	{
 		std::stringstream ss;
 		_readFile(ss, filepath);
+		//std::cout << ss.str() << std::endl;
 		attachShader(e, ss.str().c_str());
 	}
 

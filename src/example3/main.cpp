@@ -23,6 +23,7 @@ Scene scene;
 std::shared_ptr<Texture> texture;
 std::shared_ptr<ShaderProgram> shaderProgram;
 std::shared_ptr<Entity> entity;
+std::shared_ptr<Entity> ground;
 std::shared_ptr<Camera> camera;
 std::shared_ptr<Model> model;
 std::shared_ptr<Renderer> renderer;
@@ -93,26 +94,32 @@ void init()
 
 	// Entity
 	std::cout << "Entity" << std::endl;
-	//auto mesh = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadCube()));
-	auto mesh = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadTriangle()));
+
+	auto mesh = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadCube()));
+	//auto mesh = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadTriangle()));
 	model = std::make_shared<Model>();
 	model->setMesh(mesh);
 	model->setTexture(texture);
 	auto component = std::static_pointer_cast<zgl::Component>(model);
+
 	entity = std::make_shared<Entity>(glm::vec3(0.0f, -1.0f, -10.0f), glm::vec3(1.0f), glm::quat(0.5f, 0.5f, 0.5f, 0.0f));
 	entity->attachComponent(Component::Key::MODEL, component);
 	entity->attachComponent(Component::Key::RENDERER, renderer);
 
+	ground = std::make_shared<Entity>(glm::vec3(0.0f, -4.0f, 0.0f), glm::vec3(100.0f, 1.f, 100.f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	ground->attachComponent(Component::Key::MODEL, component);
+	ground->attachComponent(Component::Key::RENDERER, renderer);
+
 	// Camera
 	std::cout << "Camera" << std::endl;
 	camera = std::make_shared<Camera>();
-
 
 	// Scene
 	std::cout << "Scene" << std::endl;
 	scene.setSkyColor(glm::vec3(1.0f, 0.0f, 1.0f));
 	scene.setSunDirection(glm::vec3(1.0f, -1.0f, -1.0f));
 	scene.add(entity);
+	scene.add(ground);
 
 	std::cout << "[MAIN] Done init" << std::endl;
 }
@@ -152,7 +159,7 @@ void loop()
 		scene.render(*camera);
 		window.display();
 		foo += 0.01f;
-		entity->setPosition(glm::vec3(0,0,-foo));
+		entity->setPosition(glm::vec3(0,0,-foo-2));
 		entity->setRotorOrientation(glm::normalize(glm::quat(std::cos(foo), 0.5f, 0.5f, 1.0f)));
 	}
 }

@@ -116,4 +116,82 @@ namespace zgl
 		glBindBuffer(GL_ARRAY_BUFFER, this->m_ebo);
 		zglCheckOpenGL();
 	}
+
+
+	void Mesh::send(const std::span<float>& position, const std::span<float>& normal, const std::span<float>& uv, const std::span<IndexType>& indices)
+	{
+		std::cout << "[Mesh ->] Mesh is sending attribute(s) " << (this->hasIndex() ? "and index" : "") << " to GPU" << std::endl;
+
+		assert(this->isInit());
+		glBindVertexArray(m_vao);
+		zglCheckOpenGL();
+
+		// Calculate total vertex count
+		this->m_count = static_cast<uint32_t>(position.size() / 3); 
+
+		// Calculate stride (position + normal + uv)
+		GLsizei stride = sizeof(float) * (3 + 3 + 2);
+
+		// Create a buffer to hold interleaved data
+		std::vector<uint8_t> buffer(this->m_count * stride);
+
+		// Interleave position, normal, and uv data
+		size_t offset = 0;
+		for (size_t i = 0; i < this->m_count; ++i)
+		{
+			memcpy(buffer.data() + offset, &position[i * 3], 3 * sizeof(float)); // Copy position
+			offset += 3 * sizeof(float);
+
+			memcpy(buffer.data() + offset, &normal[i * 3], 3 * sizeof(float)); // Copy normal
+			offset += 3 * sizeof(float);
+
+			memcpy(buffer.data() + offset, &uv[i * 2], 2 * sizeof(float)); // Copy uv
+			offset += 2 * sizeof(float);
+		}
+
+		// Send the interleaved buffer to the GPU
+		Mesh::_sendVboEbo(m_vbo, GL_ARRAY_BUFFER, buffer.size(), buffer.data());
+
+		// Enable and set vertex attributes
+		glEnableVertexAttribArray(0); // Position attribute
+		zglCheckOpenGL();
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(0));
+		zglCheckOpenGL();
+
+		glEnableVertexAttribArray(1); // Normal attribute
+		zglCheckOpenGL();
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(3 * sizeof(float)));
+		zglCheckOpenGL();
+
+		glEnableVertexAttribArray(2); // UV attribute
+		zglCheckOpenGL();
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(6 * sizeof(float)));
+		zglCheckOpenGL();
+
+		// Send indices to GPU if available
+		if (!indices.empty())
+		{
+			Mesh::_sendVboEbo(m_ebo, GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(IndexType), indices.data());
+		}
+
+		std::cout
+			<< "[Mesh -X] Sent "
+			<< buffer.size()
+			<< " bytes with "
+			<< (this->hasIndex() ? "an index" : "no index")
+			<< ", a stride of " << stride
+			<< ", and a count of " << m_count
+			<< std::endl;
+
+		// Disable vertex attributes
+		/*glDisableVertexAttribArray(0);
+		zglCheckOpenGL();
+		glDisableVertexAttribArray(1);
+		zglCheckOpenGL();
+		glDisableVertexAttribArray(2);
+		zglCheckOpenGL();*/
+	}
+
+
+
 } // End namespace zgl

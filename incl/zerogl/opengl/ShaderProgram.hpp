@@ -15,6 +15,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
+#include <algorithm>
 // End includes
 
 namespace zgl
