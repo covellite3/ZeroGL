@@ -102,7 +102,7 @@ void init()
 	model->setTexture(texture);
 	auto component = std::static_pointer_cast<zgl::Component>(model);
 
-	entity = std::make_shared<Entity>(glm::vec3(0.0f, -1.0f, -10.0f), glm::vec3(1.0f), glm::quat(0.5f, 0.5f, 0.5f, 0.0f));
+	entity = std::make_shared<Entity>(glm::vec3(0.0f, -1.0f, -10.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	entity->attachComponent(Component::Key::MODEL, component);
 	entity->attachComponent(Component::Key::RENDERER, renderer);
 
@@ -117,7 +117,7 @@ void init()
 	// Scene
 	std::cout << "Scene" << std::endl;
 	scene.setSkyColor(glm::vec3(1.0f, 0.0f, 1.0f));
-	scene.setSunDirection(glm::vec3(1.0f, -1.0f, -1.0f));
+	//scene.setSunDirection(glm::vec3(1.0f, -1.0f, -1.0f));
 	scene.add(entity);
 	scene.add(ground);
 
@@ -126,10 +126,32 @@ void init()
 
 void loop()
 {
-	float foo = 0;
+	float moveSpeed = 10.f;
+	const float rotationSpeed = 10.f;
+	sf::Clock clock;
+	clock.start();
+	float dt = 0;
+	size_t iter_count = 0, previous_iter_count = 0;
+	sf::Vector2i windowCenter, currentMousePosition;
+	const float timeThreshold = 0.02f;
 	// Application loop.
 	while (window.isOpen())
 	{
+		if(clock.getElapsedTime().asSeconds() >= timeThreshold)
+		{
+			previous_iter_count = iter_count;
+			iter_count = 0;
+			dt = clock.restart().asSeconds();
+						   
+			// Rotate camera based on mouse movement.
+			auto delta = currentMousePosition - windowCenter;
+			camera->rotateDegreeAroundUpVector(-static_cast<float>(delta.x) * rotationSpeed * dt);
+			camera->rotateDegreeAroundRightVector(-static_cast<float>(delta.y) * rotationSpeed * dt);
+
+			// Reset mouse position to the center.
+			sf::Mouse::setPosition(windowCenter, window);
+			
+		}
 		// Pop an event from stack.
 		while (const std::optional event = window.pollEvent())
 		{
@@ -145,6 +167,13 @@ void loop()
 				std::cout << "[EVENT] Resized window " << width << "x" << height << std::endl;
 				glViewport(0, 0, width, height);
 				camera->setPerspective(glm::radians(45.0f), (float)width/(float)height, 0.1f, 100.0f);
+				// Get the center of the window
+				windowCenter = sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2);
+
+			}
+			if (event->is<sf::Event::MouseMoved>())
+			{
+				currentMousePosition = sf::Mouse::getPosition(window);
 
 			}
 			if(event->is<sf::Event::KeyPressed>())
@@ -154,13 +183,38 @@ void loop()
 					std::cout << "[EVENT] Pressed ESC" << std::endl;
 					window.close();
 				}
+
+				if(event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Z)
+				{
+					camera->moveFoward(moveSpeed*dt*(1.0f/static_cast<float>(previous_iter_count)));
+				}
+				if(event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Q)
+				{
+					camera->moveLeftward(moveSpeed*dt*(1.0f/static_cast<float>(previous_iter_count)));
+				}
+				if(event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::S)
+				{
+					camera->moveBackward(moveSpeed*dt*(1.0f/static_cast<float>(previous_iter_count)));
+				}
+				if(event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::D)
+				{
+					camera->moveRightward(moveSpeed*dt*(1.0f/static_cast<float>(previous_iter_count)));
+				}
+				if(event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::E)
+				{
+					camera->moveUpward(moveSpeed*dt*(1.0f/static_cast<float>(previous_iter_count)));
+				}
+				if(event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::A)
+				{
+					camera->moveDownward(moveSpeed*dt*(1.0f/static_cast<float>(previous_iter_count)));
+				}
 			}
 		}
 		scene.render(*camera);
 		window.display();
-		foo += 0.01f;
-		entity->setPosition(glm::vec3(0,0,-foo-2));
-		entity->setRotorOrientation(glm::normalize(glm::quat(std::cos(foo), 0.5f, 0.5f, 1.0f)));
+		//entity->setPosition(glm::vec3(0,0,-foo-2));
+		//entity->setRotorOrientation(glm::normalize(glm::quat(std::cos(foo), 0.5f, 0.5f, 1.0f)));
+		++iter_count;
 	}
 }
 

@@ -21,6 +21,7 @@ namespace zgl
 
 	void Renderer::render(Scene& scene, Camera& camera, Entity& entity)
 	{
+		(void)scene;
 		Model& model = entity.getAttachment<Model>(Component::Key::MODEL);
 
 		zglCheckOpenGL();
@@ -38,9 +39,9 @@ namespace zgl
 		loc = m_shaderProgram->getUniformLocation("u_projMat");
 		m_shaderProgram->setUniformMatrix(loc, projMat);
 
-		loc = m_shaderProgram->getUniformLocation("u_lightVector");
-		glm::vec3 lightVector = scene.getSunDirection();
-		m_shaderProgram->setUniformMatrix(loc, lightVector);
+		loc = m_shaderProgram->getUniformLocation("u_pointLight");
+		glm::vec3 pointLight = glm::vec3(-10, 5, 10);
+		m_shaderProgram->setUniformMatrix(loc, pointLight);
 
 		loc = m_shaderProgram->getUniformLocation("u_tex");
 		m_shaderProgram->setUniformTexture(loc, model.getTexture(), 0);

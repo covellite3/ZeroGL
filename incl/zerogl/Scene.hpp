@@ -32,15 +32,12 @@ namespace zgl
 	private:
 		std::vector<std::shared_ptr<Entity>> m_entities;
 		glm::vec3 m_skyColor;
-		glm::vec3 m_sunDirection;
 	protected:
 	public:
 		void render(Camera& camera);
 
 		inline void add(std::shared_ptr<Entity>& entity) { m_entities.push_back(entity); }
 
-		inline auto getSunDirection() const { return m_sunDirection; }
-		inline void setSunDirection(const glm::vec3& t_sunDirection) { m_sunDirection = glm::normalize(t_sunDirection); }
 		inline void setSkyColor(const glm::vec3& t_skyColor) { m_skyColor = t_skyColor; }
 	}; // End class Scene
 

@@ -1,30 +1,32 @@
 #version 330 core
-
 #include <assets/lib/std/incl/lighting.glsl>
 
-in vec3 normal;
-in vec3 fragPos;
-in vec2 uv;
+in vec2 v_uv;
+in vec3 v_normal;
+in vec3 v_cam_direction;
+in vec3 v_cam_pos;
+in vec3 v_lightVector;
 
-out vec4 FragColor;
+out vec3 FragColor;
 
-uniform vec3 u_lightVector;
-uniform sampler2D u_tex;
+uniform sampler2D u_tex; 
+
+void main() {
 
 
-void main()
-{
+	// Get texture color
+	vec3 texColor = texture2D(u_tex, vec2(v_uv.x, 1.0 - v_uv.y)).rgb;
 
-	float ambient = 0.3f;
-	vec3 lightColor = vec3(1.0);
-	vec3 normalizedNormal = normalize(normal);
-	//vec3 lightDir = normalize(lightPos - FragPos);  
-	float diff = max(dot(normalizedNormal, -u_lightVector), 0.0);
-	vec3 diffuse = diff * lightColor;
+	// Declaring structs
+	Camera cam = getCamera(v_cam_pos, v_cam_direction);
+	Light light = getLight(0.0, vec3(1.0), v_lightVector);
+	PhongMaterial surface = getPhongMaterial(1.0, 0.3, v_normal, texColor, texColor, texColor);
+	//RDM_Material surface = getRDM_Material(10.5, 0.99, v_normal, texColor, texColor, texColor);
 
-	vec3 texColor = texture(u_tex, vec2(uv.x , 1.0-uv.y)).xyz;
-	vec3 result = (ambient + diffuse) * texColor;
-	FragColor = vec4(result, 1.0);
+	// Calculate lighting
+	vec3 lighting = getPhongLighting(cam, light, surface);
+	//vec3 lighting = getRDM_Lighting(cam, sunLight, surface);
+	FragColor = lighting;
+	FragColor = v_normal;
+
 }
-
-

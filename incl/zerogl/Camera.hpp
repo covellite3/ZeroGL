@@ -46,6 +46,12 @@ namespace zgl
 			} orthographic;
 		} m_projectionParams;
 
+
+		/**
+		 * Frustrum
+		 */
+		//Frustrum frustrum;
+
 	protected:
 	public:
 		inline Camera() : m_projectionType(ProjectionType::Perspective) {
