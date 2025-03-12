@@ -24,8 +24,13 @@ namespace zgl
 		/** OpenGL's handles */
 		GLuint m_fbo, m_texture, m_depthStencil, m_rbo;
 
-		/** FrameBuffer size */
-		GLsizei m_width, m_height;
+		/** FrameBuffer viewport parameters*/
+		GLint m_viewportX, m_viewportY;
+		GLsizei m_viewportWidth, m_viewportHeight;
+
+		/** FrameBuffer default (0) viewport parameters*/
+		static GLint s_defaultViewportX, s_defaultViewportY;
+		static GLsizei s_defaultViewportWidth, s_defaultViewportHeight;
 	protected:
 	public:
 		/** Constructor */
@@ -42,33 +47,36 @@ namespace zgl
 		FrameBuffer(FrameBuffer&& other) noexcept;
 		FrameBuffer& operator=(FrameBuffer&& other) noexcept;
 
+		/**
+		 * Set default window's framebufer (0) viewport parameters
+		 * to be used when unbinding any framebuffer.
+		 * It will also imediatly call glViewport if the current bound
+		 * fbo is the default (0).
+		 */ 
+		static void setWindowViewport(const GLint x, const GLint y, const GLsizei width, const GLsizei height);
+
 		/** Init framebuffer */
-		void init(GLsizei t_width, GLsizei t_height);
+		void init(GLint x, GLuint y, GLsizei width, GLsizei height);
 
 		/** Bind the framebuffer */
 		inline void bind() const
 		{
-			std::cout << "[FrameBuffer<" << m_fbo << "> : ] Binding the framebuffer " << m_fbo << std::endl;
+			//std::cout << "[FrameBuffer<" << m_fbo << "> : ] Binding the framebuffer " << m_fbo << std::endl;
 			assert(isInit());
-			// TODO set glviewport
 			glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+			glViewport(m_viewportX, m_viewportY, m_viewportWidth, m_viewportHeight);
 			zglCheckOpenGL();
-			/*glActiveTexture(GL_TEXTURE0);
-			zglCheckOpenGL();
-			glBindTexture(GL_TEXTURE_2D, m_fbo);
-			zglCheckOpenGL();*/
-			//assert(check());
 		};
 
 		/** Unbind the framebuffer */
 		inline static void unbind()
 		{
-			GLint currentFBO;
+			/*GLint currentFBO;
 			glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO);
-			zglCheckOpenGL();
-			std::cout << "[FrameBuffer<*> : ] Unbinding the framebuffer " << currentFBO << ", (TODO add glviewport) " << std::endl;
-			// TODO set glviewport
+			zglCheckOpenGL();*/
+			//std::cout << "[FrameBuffer<*> : ] Unbinding the framebuffer " << currentFBO << std::endl;
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glViewport(s_defaultViewportX, s_defaultViewportY, s_defaultViewportWidth, s_defaultViewportHeight);
 			zglCheckOpenGL();
 		};
 

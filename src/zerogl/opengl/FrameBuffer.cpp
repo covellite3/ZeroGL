@@ -9,6 +9,11 @@
 
 namespace zgl
 {
+	GLint FrameBuffer::s_defaultViewportX = 0;
+	GLint FrameBuffer::s_defaultViewportY = 0;
+	GLsizei FrameBuffer::s_defaultViewportWidth = 0;
+	GLsizei FrameBuffer::s_defaultViewportHeight = 0;
+
 	FrameBuffer::FrameBuffer()
 		: m_fbo(0), m_texture(0), m_depthStencil(0), m_rbo(0)
 	{
@@ -52,11 +57,27 @@ namespace zgl
 		this->m_rbo = 0;
 	}
 
-	void FrameBuffer::init(GLsizei t_width, GLsizei t_height)
+	void FrameBuffer::setWindowViewport(const GLint x, const GLint y, const GLsizei width, const GLsizei height)
+	{
+		GLint currentFBO;
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO);
+		zglCheckOpenGL();
+		if(currentFBO == 0)
+			glViewport(x, y, width, height);
+		s_defaultViewportX = x;
+		s_defaultViewportY = y;
+		s_defaultViewportWidth = width;
+		s_defaultViewportHeight = height;
+
+	}
+
+	void FrameBuffer::init(GLint x, GLuint y, GLsizei width, GLsizei height)
 	{
 		assert(!isInit());
-		this->m_width = t_width;
-		this->m_height = t_height;
+		this->m_viewportX = x;
+		this->m_viewportY = y;
+		this->m_viewportWidth = width;
+		this->m_viewportHeight = height;
 		glGenFramebuffers(1, &m_fbo);
 		zglCheckOpenGL();
 
@@ -68,13 +89,11 @@ namespace zgl
 		std::cout << "[FrameBuffer<" << m_fbo << "> ! ] Starting process to attach texture " << std::endl;
 		assert(isInit());
 		assert(!hasTexture());
-		//glBindTexture(GL_TEXTURE_2D, 0);	zglCheckOpenGL();
 		bind();
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_texture);
-		//glGenTextures(1, &m_texture);	zglCheckOpenGL();
 		glBindTexture(GL_TEXTURE_2D, m_texture);	zglCheckOpenGL();
 		  
-		glTexImage2D(	GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0,
+		glTexImage2D(	GL_TEXTURE_2D, 0, GL_RGB, m_viewportWidth, m_viewportHeight, 0,
 				GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		zglCheckOpenGL();
 
@@ -82,7 +101,6 @@ namespace zgl
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	zglCheckOpenGL();
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture, 0);	zglCheckOpenGL(); 
 		assert(isComplete());
-		//glBindTexture(GL_TEXTURE_2D, 0);	zglCheckOpenGL();
 		unbind();
 
 		std::cout << "[FrameBuffer<" << m_fbo << "> ! ] Attached texture " << m_texture << std::endl;
@@ -93,22 +111,18 @@ namespace zgl
 		std::cout << "[FrameBuffer<" << m_fbo << "> ! ] Starting process to attach depth/stencil " << std::endl;
 		assert(isInit());
 		assert(!hasDepthStencilBuffer());
-		//glBindTexture(GL_TEXTURE_2D, 0);	zglCheckOpenGL();
 		bind();
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_depthStencil);	zglCheckOpenGL();
 		glBindTexture(GL_TEXTURE_2D, m_depthStencil);	zglCheckOpenGL();
 		  
-		//glTexImage2D(	GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_width, m_height, 0, 
-		//		GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
 		zglCheckOpenGL();
 
-		glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, m_width, m_height);
+		glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, m_viewportWidth, m_viewportHeight);
 		zglCheckOpenGL();
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthStencil, 0);  
 		zglCheckOpenGL();
 		assert(isComplete());
-		//glBindTexture(GL_TEXTURE_2D, 0);	zglCheckOpenGL();
 		unbind();
 
 

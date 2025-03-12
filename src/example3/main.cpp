@@ -126,7 +126,7 @@ void init()
 	auto meshQuad = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadQuad()));
 	auto modelQuad = std::make_shared<Model>();
 	framebuffer = std::make_shared<FrameBuffer>();
-	framebuffer->init(1024, 1024);
+	framebuffer->init(0, 0, 1024, 1024);
 	framebuffer->attachTexture();
 	framebuffer->attachDepthStencil();
 	framebuffer->unbind();
@@ -194,7 +194,7 @@ void loop()
 				auto width = resized->size.x;
 				auto height = resized->size.y;
 				std::cout << "[EVENT] Resized window " << width << "x" << height << std::endl;
-				glViewport(0, 0, width, height);
+				FrameBuffer::setWindowViewport(0, 0, width, height);
 				camera->setPerspective(glm::radians(45.0f), (float)width/(float)height, 0.1f, 100.0f);
 				// Get the center of the window
 				windowCenter = sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2);
