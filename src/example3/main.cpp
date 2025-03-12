@@ -3,6 +3,7 @@
 #include "zerogl/Mesh.hpp"
 #include "zerogl/Renderer.hpp"
 #include "zerogl/Camera.hpp"
+#include "zerogl/opengl/Texture.hpp"
 #include "zerogl/loader/Loader3D.hpp"
 
 #include <iostream>
@@ -12,7 +13,7 @@
 
 #include <SFML/OpenGL.hpp>
 #include <SFML/Window.hpp>
-#include <SFML/Graphics/Texture.hpp>
+//#include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics.hpp>
 
 using namespace sf;
@@ -20,13 +21,14 @@ using namespace zgl;
 
 sf::Window window;
 Scene scene;
-std::shared_ptr<Texture> texture;
+std::shared_ptr<zgl::Texture> tex1, tex2;
 std::shared_ptr<ShaderProgram> shaderProgram;
 std::shared_ptr<Entity> entity;
+std::shared_ptr<Entity> screen;
 std::shared_ptr<Entity> ground;
 std::shared_ptr<Camera> camera;
-std::shared_ptr<Model> model;
 std::shared_ptr<Renderer> renderer;
+std::shared_ptr<FrameBuffer> framebuffer;
 
 void init()
 {
@@ -81,8 +83,15 @@ void init()
 	}
 
 	// Texture
-	texture = std::make_shared<sf::Texture>();
-	if (!texture->loadFromFile("assets/textures/tex2.png")) {
+	tex1 = std::make_shared<zgl::Texture>();
+	if (!tex1->loadFromFile("assets/textures/tex1.png")) {
+		std::cerr << "Could no load image" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	// Texture
+	tex2 = std::make_shared<zgl::Texture>();
+	if (!tex2->loadFromFile("assets/textures/tex2.png")) {
 		std::cerr << "Could no load image" << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -95,20 +104,39 @@ void init()
 	// Entity
 	std::cout << "Entity" << std::endl;
 
-	auto mesh = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadCube()));
-	//auto mesh = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadTriangle()));
-	model = std::make_shared<Model>();
-	model->setMesh(mesh);
-	model->setTexture(texture);
-	auto component = std::static_pointer_cast<zgl::Component>(model);
+	auto mesh1 = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadCube()));
+	auto model1 = std::make_shared<Model>();
+	model1->setMesh(mesh1);
+	model1->setTexture(tex1);
+	auto component1 = std::static_pointer_cast<zgl::Component>(model1);
 
 	entity = std::make_shared<Entity>(glm::vec3(0.0f, -1.0f, -10.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-	entity->attachComponent(Component::Key::MODEL, component);
+	entity->attachComponent(Component::Key::MODEL, component1);
 	entity->attachComponent(Component::Key::RENDERER, renderer);
 
+	auto mesh2 = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadCube()));
+	auto model2 = std::make_shared<Model>();
+	model2->setMesh(mesh2);
+	model2->setTexture(tex2);
+	auto component2 = std::static_pointer_cast<zgl::Component>(model2);
 	ground = std::make_shared<Entity>(glm::vec3(0.0f, -4.0f, 0.0f), glm::vec3(100.0f, 1.f, 100.f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-	ground->attachComponent(Component::Key::MODEL, component);
+	ground->attachComponent(Component::Key::MODEL, component2);
 	ground->attachComponent(Component::Key::RENDERER, renderer);
+
+	auto meshQuad = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadQuad()));
+	auto modelQuad = std::make_shared<Model>();
+	framebuffer = std::make_shared<FrameBuffer>();
+	framebuffer->init(1024, 1024);
+	framebuffer->attachTexture();
+	framebuffer->attachDepthStencil();
+	framebuffer->unbind();
+	modelQuad->setMesh(meshQuad);
+	modelQuad->setFramebuffer(framebuffer);
+	auto componentQuad = std::static_pointer_cast<zgl::Component>(modelQuad);
+
+	screen = std::make_shared<Entity>(glm::vec3(0.0f, 1.0f, -5.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	screen->attachComponent(Component::Key::MODEL, componentQuad);
+	screen->attachComponent(Component::Key::RENDERER, renderer);
 
 	// Camera
 	std::cout << "Camera" << std::endl;
@@ -120,6 +148,7 @@ void init()
 	//scene.setSunDirection(glm::vec3(1.0f, -1.0f, -1.0f));
 	scene.add(entity);
 	scene.add(ground);
+	scene.add(screen);
 
 	std::cout << "[MAIN] Done init" << std::endl;
 }
@@ -210,7 +239,11 @@ void loop()
 				}
 			}
 		}
+		framebuffer->bind();
 		scene.render(*camera);
+		framebuffer->unbind();
+		scene.render(*camera);
+
 		window.display();
 		//entity->setPosition(glm::vec3(0,0,-foo-2));
 		//entity->setRotorOrientation(glm::normalize(glm::quat(std::cos(foo), 0.5f, 0.5f, 1.0f)));

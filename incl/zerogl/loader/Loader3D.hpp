@@ -24,6 +24,7 @@ namespace zgl
 	protected:
 	public:
 		static Mesh loadTriangle();
+		static Mesh loadQuad();
 		static Mesh loadCube();
 	}; // End class Loader3D
 

@@ -12,6 +12,8 @@
 #include "zerogl/Mesh.hpp"
 #include "zerogl/Material.hpp"
 #include "zerogl/Skeleton.hpp"
+#include "zerogl/opengl/FrameBuffer.hpp"
+#include "zerogl/opengl/Texture.hpp"
 
 #include <memory>
 // End includes
@@ -27,7 +29,8 @@ namespace zgl
 	{
 	private:
 		std::shared_ptr<Mesh> m_mesh;
-		std::shared_ptr<sf::Texture> m_texture;
+		std::shared_ptr<Texture> m_texture;
+		std::shared_ptr<FrameBuffer> m_framebuffer;
 		//Material m_material;
 		//Skeleton m_skeleton;
 	protected:
@@ -38,9 +41,13 @@ namespace zgl
 		inline void setMesh(std::shared_ptr<Mesh>& t_mesh) { m_mesh = t_mesh; }
 
 
-		inline auto& getTexture() { return *m_texture.get(); }
-		inline void setTexture(std::shared_ptr<sf::Texture>& t_texture) { m_texture = t_texture; }
+		inline auto getTexture() { return m_texture.get(); }
+		inline void setTexture(std::shared_ptr<Texture>& t_texture) { m_texture = t_texture; }
 		
+		inline auto getFramebuffer() { return m_framebuffer.get(); }
+		inline void setFramebuffer(std::shared_ptr<FrameBuffer>& t_framebuffer) { m_framebuffer = t_framebuffer; }
+		
+
 		//Model(Mesh&& t_mesh, Material&& t_material, Skeleton&& m_Skeleton);
 	}; // End class Model
 

@@ -10,6 +10,44 @@
 namespace zgl
 {
 
+	Mesh Loader3D::loadQuad()
+	{
+
+		Mesh mesh;
+		mesh.init(/*t_nAttributes*/3, /*t_useIndex*/true);
+
+		std::array<float, 12> positions = {
+			-0.5f, -0.5f, 0.0f,
+			-0.5f,  0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.5f,  0.5f, 0.0f
+		};
+		std::array<float, 12> normals = {
+			0.0f,  0.0f, -1.0f,
+			0.0f, 0.0f, -1.0f,
+			0.0f, 0.0f, -1.0f,
+			0.0f, 0.0f, -1.0f
+		};
+		std::array<float, 8> uvs = {
+			0.0f, 0.0f,
+			0.0f, 1.0f,
+			1.0f, 0.0f,
+			1.0f, 1.0f
+		};
+		std::array<Mesh::IndexType, 6> indices = {
+			0, 1, 2,
+			3, 1, 2
+		};
+
+		mesh.send(
+			std::span<float>(positions),           // POS
+			std::span<float>(normals),             // NORMAL
+			std::span<float>(uvs),                 // UV
+			std::span<Mesh::IndexType>(indices)       // INDEX
+		);
+
+		return mesh;
+	}
 
 	Mesh Loader3D::loadTriangle()
 	{

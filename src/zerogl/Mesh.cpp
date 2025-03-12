@@ -123,11 +123,13 @@ namespace zgl
 		std::cout << "[Mesh ->] Mesh is sending attribute(s) " << (this->hasIndex() ? "and index" : "") << " to GPU" << std::endl;
 
 		assert(this->isInit());
+		assert(hasIndex() && indices.size() > 0);
 		glBindVertexArray(m_vao);
 		zglCheckOpenGL();
 
 		// Calculate total vertex count
-		this->m_count = static_cast<uint32_t>(position.size() / 3); 
+		if(hasIndex()) this->m_count = static_cast<uint32_t>(indices.size()); 
+		else this->m_count = static_cast<uint32_t>(position.size() / 3); 
 
 		// Calculate stride (position + normal + uv)
 		GLsizei stride = sizeof(float) * (3 + 3 + 2);

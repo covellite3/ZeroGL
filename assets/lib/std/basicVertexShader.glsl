@@ -16,18 +16,19 @@ uniform mat4 u_viewMat;
 uniform mat4 u_projMat;
 
 uniform vec3 u_pointLight;
-
+uniform vec3 u_camPos;
 
 void main()
 {
+	vec4 worldPosition = u_modelMat * vec4(a_position, 1.0);
+	v_cam_pos = vec3(u_viewMat * worldPosition);
 	v_uv = a_uv;
-	v_normal = mat3(transpose(inverse(u_modelMat))) * a_normal;  
-	v_cam_direction = getDirectionFromView(u_viewMat);
-	v_cam_pos = getPosFromView(u_viewMat);
+	v_normal = mat3(transpose(inverse(u_modelMat))) * a_normal;
+	v_lightVector = u_pointLight - vec3(worldPosition);
+	v_cam_direction = u_camPos - vec3(worldPosition);
 
-	gl_Position.xyzw = u_projMat * u_viewMat * u_modelMat * vec4(a_position.xyz, 1.0);
-	vec3 FragPos = vec3(u_modelMat * vec4(a_position, 1.0));
-	v_lightVector = normalize(u_pointLight - FragPos);  
+	gl_Position = u_projMat * u_viewMat * worldPosition;
 }
+
 
 

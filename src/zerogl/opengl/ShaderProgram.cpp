@@ -170,6 +170,26 @@ namespace zgl
 		return location;
 	}
 
+	void ShaderProgram::setUniformTexture(const GLuint location, const GLuint handle, size_t unit)
+	{
+		std::cout << "[ShaderProgram<" << m_handle
+				<< "> ->] Sending uniform texture's handle " << handle
+				<< " as active unit " << unit
+				<< " at shader's location " << location << std::endl;
+		assert(m_status == LINKED);
+		assert(unit < GL_MAX_TEXTURE_UNITS);
+		zglCheckOpenGL();
+		bind(*this);
+
+		glActiveTexture(OpenGL::mapTextureUnit(unit));
+		zglCheckOpenGL();
+		glBindTexture(GL_TEXTURE_2D, handle);
+		zglCheckOpenGL();
+		glUniform1i(location, static_cast<GLuint>(unit));
+		zglCheckOpenGL();
+	}
+
+
 
 	size_t ShaderProgram::_mapEnumToIndex (GLenum enumShader)
 	{

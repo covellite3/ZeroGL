@@ -9,24 +9,22 @@ in vec3 v_lightVector;
 
 out vec3 FragColor;
 
-uniform sampler2D u_tex; 
+uniform sampler2D u_tex;
 
 void main() {
+	// Basic lighting calculation
+	vec3 lightDir = normalize(v_lightVector);
+	float diff = max(dot(v_normal, lightDir), 0.0);
+	vec3 diffuse = diff * vec3(1.0, 1.0, 1.0); 
 
+	// Ambient lighting
+	vec3 ambient = 0.1 * vec3(1.0, 1.0, 1.0);
 
-	// Get texture color
-	vec3 texColor = texture2D(u_tex, vec2(v_uv.x, 1.0 - v_uv.y)).rgb;
-
-	// Declaring structs
-	Camera cam = getCamera(v_cam_pos, v_cam_direction);
-	Light light = getLight(0.0, vec3(1.0), v_lightVector);
-	PhongMaterial surface = getPhongMaterial(1.0, 0.3, v_normal, texColor, texColor, texColor);
-	//RDM_Material surface = getRDM_Material(10.5, 0.99, v_normal, texColor, texColor, texColor);
-
-	// Calculate lighting
-	vec3 lighting = getPhongLighting(cam, light, surface);
-	//vec3 lighting = getRDM_Lighting(cam, sunLight, surface);
-	FragColor = lighting;
-	FragColor = v_normal;
-
+	// View direction
+	vec3 viewDir = normalize(v_cam_direction);
+	
+	// Combine texture and lighting
+	vec4 texColor = texture(u_tex, v_uv);
+	FragColor = texColor.rgb * (ambient + diffuse);
 }
+

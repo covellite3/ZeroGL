@@ -44,8 +44,23 @@ namespace zgl
 		m_shaderProgram->setUniformMatrix(loc, pointLight);
 
 		loc = m_shaderProgram->getUniformLocation("u_tex");
-		m_shaderProgram->setUniformTexture(loc, model.getTexture(), 0);
+		if(model.getTexture() != nullptr)
+		{
+			std::cout << "[Renderer ?] Model as texture: " << model.getTexture()->getHandle() << std::endl;
+			m_shaderProgram->setUniformTexture(loc, model.getTexture()->getHandle(), 0);
+		}
+		else if(model.getFramebuffer() != nullptr)
+		{
+			std::cout << "[Renderer ?] Model as framebuffer: " << model.getFramebuffer()->getTextureHandle() << std::endl;
+			m_shaderProgram->setUniformTexture(loc, model.getFramebuffer()->getTextureHandle(), 0);
+		}
+		else std::runtime_error("Missing texture or framebuffer");
 
+		GLint boundTexture;
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
+		zglCheckOpenGL();
+		std::cout << "[Renderer ?] Bounded texture before drawing: " << boundTexture << std::endl;
+		
 		model.getMesh().draw(*m_shaderProgram.get());
 	}
 
