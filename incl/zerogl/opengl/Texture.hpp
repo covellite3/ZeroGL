@@ -40,7 +40,11 @@ namespace zgl
 
 		void release();
 
-		bool loadFromFile(const std::string& filePath);
+		bool loadFromFile(
+				const std::string& filePath,
+				const GLenum wrap,
+				const GLenum minFilter,
+				const GLenum magFilter);
 
 		inline auto isInit() const { return m_handle != 0; }
 		inline auto getHandle() const { return m_handle; }

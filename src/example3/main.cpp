@@ -90,14 +90,14 @@ void init()
 
 	// Texture
 	tex1 = std::make_shared<zgl::Texture>();
-	if (!tex1->loadFromFile("assets/textures/tex1.png")) {
+	if (!tex1->loadFromFile("assets/textures/dirt.png", GL_REPEAT, GL_NEAREST, GL_NEAREST)) {
 		std::cerr << "Could no load image" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	// Texture
 	tex2 = std::make_shared<zgl::Texture>();
-	if (!tex2->loadFromFile("assets/textures/tex2.png")) {
+	if (!tex2->loadFromFile("assets/textures/tex2.png", GL_REPEAT, GL_NEAREST, GL_NEAREST)) {
 		std::cerr << "Could no load image" << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -116,7 +116,7 @@ void init()
 	model1->setTexture(tex1);
 	auto component1 = std::static_pointer_cast<zgl::Component>(model1);
 
-	entity = std::make_shared<Entity>(glm::vec3(0.0f, -1.0f, -10.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	entity = std::make_shared<Entity>(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	entity->attachComponent(Component::Key::MODEL, component1);
 	entity->attachComponent(Component::Key::RENDERER, renderer);
 
@@ -125,7 +125,7 @@ void init()
 	model2->setMesh(mesh2);
 	model2->setTexture(tex2);
 	auto component2 = std::static_pointer_cast<zgl::Component>(model2);
-	ground = std::make_shared<Entity>(glm::vec3(0.0f, -4.0f, 0.0f), glm::vec3(100.0f, 1.f, 100.f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	ground = std::make_shared<Entity>(glm::vec3(0.0f, -4.0f, 0.0f), glm::vec3(15.0f, 1.f, 15.f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	ground->attachComponent(Component::Key::MODEL, component2);
 	ground->attachComponent(Component::Key::RENDERER, renderer);
 
@@ -147,16 +147,17 @@ void init()
 	// Camera
 	std::cout << "Camera" << std::endl;
 	camera = std::make_shared<Camera>();
+	camera->setPosition(glm::vec3(0,0,10));
 
 	// Light
 	std::cout << "Light" << std::endl;
 	light = std::make_shared<Light>();
-	light->setPosition(glm::vec3(0,10,0));
-	light->lookAt(glm::vec3(0,-1,-10), glm::vec3(0,1,0));
+	light->setPosition(glm::vec3(50,100,80));
+	light->lookAt(glm::vec3(0,0,0), glm::vec3(0,1,0));
 
 	// Scene
 	std::cout << "Scene" << std::endl;
-	scene.setSkyColor(glm::vec3(1.0f, 0.0f, 1.0f));
+	scene.setSkyColor(glm::vec3(0.5f, 0.5f, 1.0f));
 	scene.setLight(light);
 	scene.add(entity);
 	scene.add(ground);
@@ -256,9 +257,7 @@ void loop()
 		framebuffer->unbind();
 		scene.render(*camera);
 
-		//light->setPosition(glm::vec3(0,10,0) + camera->getPosition());
-		//light->lookAt(glm::vec3(0,-1,-10), glm::vec3(0,1,0));
-		camera->lookAt(glm::vec3(0,-1,-10), glm::vec3(0,1,0));
+		camera->lookAt(glm::vec3(0,-1,0), glm::vec3(0,1,0));
 
 
 		window.display();

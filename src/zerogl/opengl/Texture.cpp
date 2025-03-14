@@ -42,7 +42,7 @@ namespace zgl
 		return *this;
 	}
 
-	bool Texture::loadFromFile(const std::string& filePath) {
+	bool Texture::loadFromFile(const std::string& filePath, const GLenum wrap, const GLenum minFilter, const GLenum magFilter) {
 		if (isInit()) {
 			throw std::runtime_error("Texture already initialized.");
 		}
@@ -56,13 +56,13 @@ namespace zgl
 		zglCheckOpenGL();
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.getSize().x, image.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
 		zglCheckOpenGL();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 		zglCheckOpenGL();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
 		zglCheckOpenGL();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
 		zglCheckOpenGL();
 
 		glBindTexture(GL_TEXTURE_2D, 0);
