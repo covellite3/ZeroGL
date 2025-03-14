@@ -11,6 +11,7 @@
 #include "zerogl/Entity.hpp"
 #include "zerogl/Camera.hpp"
 #include "zerogl/Renderer.hpp"
+#include "zerogl/Light.hpp"
 
 #include <vector>
 // End includes
@@ -32,6 +33,7 @@ namespace zgl
 	private:
 		std::vector<std::shared_ptr<Entity>> m_entities;
 		glm::vec3 m_skyColor;
+		std::shared_ptr<Light> m_light;
 	protected:
 	public:
 		void render(Camera& camera);
@@ -39,6 +41,10 @@ namespace zgl
 		inline void add(std::shared_ptr<Entity>& entity) { m_entities.push_back(entity); }
 
 		inline void setSkyColor(const glm::vec3& t_skyColor) { m_skyColor = t_skyColor; }
+
+		inline void setLight(std::shared_ptr<Light>& t_light) { m_light = t_light; }
+
+		inline auto getLight() { return m_light; }
 	}; // End class Scene
 
 } // End namespace zgl

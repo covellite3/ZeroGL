@@ -9,16 +9,6 @@
  
 namespace zgl
 {
-
-	void printMatrix(const glm::mat4 &matrix) {
-		for (int row = 0; row < 4; ++row) {
-			for (int col = 0; col < 4; ++col) {
-				std::cout << matrix[row][col] << " ";
-			}
-			std::cout << std::endl;
-		}
-	}
-
 	void Renderer::render(Scene& scene, Camera& camera, Entity& entity)
 	{
 		(void)scene;
@@ -30,6 +20,8 @@ namespace zgl
 		glm::mat4 viewMat = camera.getViewMatrix();
 		glm::mat4 projMat = camera.getProjectionMatrix();
 
+		// Model View Perpective
+
 		auto loc = m_shaderProgram->getUniformLocation("u_modelMat");
 		m_shaderProgram->setUniformMatrix(loc, modelMat);
 
@@ -39,9 +31,15 @@ namespace zgl
 		loc = m_shaderProgram->getUniformLocation("u_projMat");
 		m_shaderProgram->setUniformMatrix(loc, projMat);
 
-		loc = m_shaderProgram->getUniformLocation("u_pointLight");
-		glm::vec3 pointLight = glm::vec3(-10, 5, 10);
-		m_shaderProgram->setUniformMatrix(loc, pointLight);
+		// Light
+		loc = m_shaderProgram->getUniformLocation("u_colorLight");
+		m_shaderProgram->setUniformMatrix(loc, scene.getLight()->getLightColor());
+		loc = m_shaderProgram->getUniformLocation("u_coordLight");
+		m_shaderProgram->setUniformMatrix(loc, scene.getLight()->getPosition());
+		loc = m_shaderProgram->getUniformLocation("u_directionLight");
+		m_shaderProgram->setUniformMatrix(loc, scene.getLight()->getLightDirection());
+
+		// Texture
 
 		loc = m_shaderProgram->getUniformLocation("u_tex");
 		if(model.getTexture() != nullptr)
@@ -56,10 +54,7 @@ namespace zgl
 		}
 		else std::runtime_error("Missing texture or framebuffer");
 
-		/*GLint boundTexture;
-		glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
-		zglCheckOpenGL();*/
-		//std::cout << "[Renderer ?] Bounded texture before drawing: " << boundTexture << std::endl;
+		// Render mesh
 		
 		model.getMesh().draw(*m_shaderProgram.get());
 	}

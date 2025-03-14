@@ -38,7 +38,7 @@ namespace zgl
 	 */
 
 	/** Get oriented rotation around an pivot vector. */
-	inline static glm::quat getQuaternion(float rad, glm::vec3& pivot) {
+	inline static glm::quat getQuaternion(const float rad, const glm::vec3& pivot) {
 		double x = pivot.x * sin(rad / 2.0);
 		double y = pivot.y * sin(rad / 2.0);
 		double z = pivot.z * sin(rad / 2.0);

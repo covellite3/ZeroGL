@@ -36,7 +36,7 @@ namespace zgl
 		/**
 		 * Vectors who are oriented with the camera.
 		 */
-		glm::vec3 m_rightVector, m_upVector, m_backVector;
+		//glm::vec3 m_rightVector, m_upVector, m_backVector;
 		
 	protected:
 	public:
@@ -70,46 +70,75 @@ namespace zgl
 			return m_attachments.size();
 		}
 
+
+		/**
+		 * Get the right vector of the camera.
+		 */
+		inline auto getRightVector() const {
+			return m_orientation * glm::vec3(1, 0, 0);
+		}
+
+		/**
+		 * Get the up vector of the camera.
+		 */
+		inline auto getUpVector() const {
+			return m_orientation * glm::vec3(0, 1, 0);
+		}
+
+		/**
+		 * Get the back vector of the camera.
+		 */
+		inline auto getBackVector() const {
+			return m_orientation * glm::vec3(0, 0, 1);
+		}
+
+		inline void lookAt(const glm::vec3& where, const glm::vec3& up)
+		{
+			//m_orientation = glm::quat_cast(glm::lookAt(m_position, where, up));
+			glm::mat4 viewMatrix = glm::lookAt(m_position, where, up);
+			m_orientation = glm::quat_cast(glm::inverse(viewMatrix));
+		}
+
 		/**
 		 * Move camera foward in meters.
 		 */
-		inline void moveFoward(float amount) {
-			m_position = m_position - m_backVector * amount;
+		inline void moveFoward(const float amount) {
+			m_position = m_position - getBackVector() * amount;
 		}
 
 		/**
 		 * Move camera backward in meters.
 		 */
-		inline void moveBackward(float amount) {
-			m_position = m_position + m_backVector * amount;
+		inline void moveBackward(const float amount) {
+			m_position = m_position + getBackVector() * amount;
 		}
 
 		/**
 		 * Move camera leftward in meters.
 		 */
-		inline void moveLeftward(float amount) {
-			m_position = m_position - m_rightVector * amount;
+		inline void moveLeftward(const float amount) {
+			m_position = m_position - getRightVector() * amount;
 		}
 
 		/**
 		 * Move camera rightward in meters.
 		 */
-		inline void moveRightward(float amount) {
-			m_position = m_position + m_rightVector * amount;
+		inline void moveRightward(const float amount) {
+			m_position = m_position + getRightVector() * amount;
 		}
 
 		/**
 		 * Move camera upward in meters.
 		 */
-		inline void moveUpward(float amount) {
-			m_position = m_position + m_upVector * amount;
+		inline void moveUpward(const float amount) {
+			m_position = m_position + getUpVector() * amount;
 		}
 
 		/**
 		 * Move camera downward in meters.
 		 */
-		inline void moveDownward(float amount) {
-			m_position = m_position - m_upVector * amount;
+		inline void moveDownward(const float amount) {
+			m_position = m_position - getUpVector() * amount;
 		}
 
 		/**
@@ -117,48 +146,25 @@ namespace zgl
 		 * Update orientation, m_upVector, m_rightVector
 		 * and m_backVector;
 		 */
-		inline void rotateRadianAroundPivot(float rad, glm::vec3& pivot) {
+		inline void rotateRadianAroundPivot(const float rad, const glm::vec3& pivot) {
 			glm::quat pivotRotation = getQuaternion(rad, pivot);
 
 			m_orientation = pivotRotation * m_orientation;
 
-			m_rightVector = m_orientation * glm::vec3(1, 0, 0);
-			m_upVector = m_orientation * glm::vec3(0, 1, 0);
-			m_backVector = m_orientation * glm::vec3(0, 0, 1);
 		}
 
-		inline void rotateDegreeAroundUpVector(float degree) {
-			rotateRadianAroundPivot(glm::radians(degree), m_upVector);
+		inline void rotateDegreeAroundUpVector(const float degree) {
+			rotateRadianAroundPivot(glm::radians(degree), getUpVector());
 		}
 
-		inline void rotateDegreeAroundRightVector(float degree) {
-			rotateRadianAroundPivot(glm::radians(degree), m_rightVector);
+		inline void rotateDegreeAroundRightVector(const float degree) {
+			rotateRadianAroundPivot(glm::radians(degree), getRightVector());
 		}
 
-		inline void rotateDegreeAroundBackVector(float degree) {
-			rotateRadianAroundPivot(glm::radians(degree), m_backVector);
+		inline void rotateDegreeAroundBackVector(const float degree) {
+			rotateRadianAroundPivot(glm::radians(degree), getBackVector());
 		}
 
-		/**
-		 * Get the right vector of the camera.
-		 */
-		inline auto getRightVector() const {
-			return m_rightVector;
-		}
-
-		/**
-		 * Get the up vector of the camera.
-		 */
-		inline auto getUpVector() const {
-			return m_upVector;
-		}
-
-		/**
-		 * Get the back vector of the camera.
-		 */
-		inline auto getBackVector() const {
-			return m_backVector;
-		}
 
 		inline auto getPosition() const
 		{
@@ -188,14 +194,13 @@ namespace zgl
 		inline void setRotorOrientation(const auto &t_orientation)
 		{
 			m_orientation = t_orientation;
-			m_rightVector = m_orientation * glm::vec3(1, 0, 0);
+			/*m_rightVector = m_orientation * glm::vec3(1, 0, 0);
 			m_upVector = m_orientation * glm::vec3(0, 1, 0);
-			m_backVector = m_orientation * glm::vec3(0, 0, 1);
+			m_backVector = m_orientation * glm::vec3(0, 0, 1);*/
 		}
 
 		inline auto getModelMatrix() const
 		{
-			//assert(glm::abs(glm::length(m_orientation) - 1.0f) < 0.0001f);
 			glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), m_scale);
 			glm::mat4 rotateMat = glm::mat4_cast(m_orientation);
 			glm::mat4 translateMat = glm::translate(glm::mat4(1.0f), m_position);

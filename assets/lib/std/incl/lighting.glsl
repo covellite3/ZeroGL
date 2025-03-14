@@ -224,6 +224,7 @@ vec3 RDM_bsdf(float LdotH, float NdotH, float VdotH, float LdotN, float VdotN, f
  * Get RDM Lighting based on Cook-Torrance model.
  */
 vec3 getRDM_Lighting(Camera cam, Light light, RDM_Material material) {
+	// TODO rewrite this
 	vec3 n = material.normal;
 	vec3 v = -cam.direction;
 	vec3 l = -light.direction;
@@ -242,3 +243,12 @@ vec3 getRDM_Lighting(Camera cam, Light light, RDM_Material material) {
 	return clamp(lc * bsdf * LdotN, 0.0, 1.0);
 }
 
+
+//
+// Shadow map
+//
+
+/*bool isInShadown(sampler2D shadowMap, mat4 lightWorldViewProjectionMat, lightSpacePosition)
+{
+	return false; 
+}*/

@@ -3,6 +3,7 @@
 #include "zerogl/Mesh.hpp"
 #include "zerogl/Renderer.hpp"
 #include "zerogl/Camera.hpp"
+#include "zerogl/Light.hpp"
 #include "zerogl/opengl/Texture.hpp"
 #include "zerogl/loader/Loader3D.hpp"
 
@@ -23,6 +24,7 @@ sf::Window window;
 Scene scene;
 std::shared_ptr<zgl::Texture> tex1, tex2;
 std::shared_ptr<ShaderProgram> shaderProgram;
+std::shared_ptr<Light> light;
 std::shared_ptr<Entity> entity;
 std::shared_ptr<Entity> screen;
 std::shared_ptr<Entity> ground;
@@ -63,8 +65,12 @@ void init()
 		exit(EXIT_FAILURE);
 	}
 	glEnable(GL_DEBUG_OUTPUT);
-	
+	zglCheckOpenGL();
 	glEnable(GL_DEPTH_TEST);
+	zglCheckOpenGL();
+	glEnable(GL_CULL_FACE); 
+	zglCheckOpenGL();
+	glCullFace(GL_FRONT);
 	zglCheckOpenGL();
 
 	// Shader
@@ -134,7 +140,7 @@ void init()
 	modelQuad->setFramebuffer(framebuffer);
 	auto componentQuad = std::static_pointer_cast<zgl::Component>(modelQuad);
 
-	screen = std::make_shared<Entity>(glm::vec3(0.0f, 1.0f, -5.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	screen = std::make_shared<Entity>(glm::vec3(0.0f, 0.5f, -2.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	screen->attachComponent(Component::Key::MODEL, componentQuad);
 	screen->attachComponent(Component::Key::RENDERER, renderer);
 
@@ -142,10 +148,21 @@ void init()
 	std::cout << "Camera" << std::endl;
 	camera = std::make_shared<Camera>();
 
+	// Light
+	std::cout << "Light" << std::endl;
+	light = std::make_shared<Light>();
+	light->setPosition(glm::vec3(0,10,0));
+	light->lookAt(glm::vec3(0,-1,-10), glm::vec3(0,1,0));
+	glm::vec3 position = light->getPosition();
+	std::cout << "Light Position: (" << position.x << ", " << position.y << ", " << position.z << ")\n";
+	glm::vec3 lightDirection = light->getLightDirection();
+	std::cout << "Light Direction: (" << lightDirection.x << ", " << lightDirection.y << ", " << lightDirection.z << ")\n";
+
+
 	// Scene
 	std::cout << "Scene" << std::endl;
 	scene.setSkyColor(glm::vec3(1.0f, 0.0f, 1.0f));
-	//scene.setSunDirection(glm::vec3(1.0f, -1.0f, -1.0f));
+	scene.setLight(light);
 	scene.add(entity);
 	scene.add(ground);
 	scene.add(screen);
@@ -243,6 +260,11 @@ void loop()
 		scene.render(*camera);
 		framebuffer->unbind();
 		scene.render(*camera);
+
+		//light->setPosition(glm::vec3(0,10,0) + camera->getPosition());
+		//light->lookAt(glm::vec3(0,-1,-10), glm::vec3(0,1,0));
+		camera->lookAt(glm::vec3(0,-1,-10), glm::vec3(0,1,0));
+
 
 		window.display();
 		//entity->setPosition(glm::vec3(0,0,-foo-2));

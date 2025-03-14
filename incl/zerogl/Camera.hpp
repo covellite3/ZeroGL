@@ -9,7 +9,8 @@
 
 // Includes
 #include "zerogl/Entity.hpp"
-#include "zerogl/Scene.hpp"
+//#include "zerogl/Scene.hpp"
+#include "zerogl/opengl/FrameBuffer.hpp"
 // End includes
 
 namespace zgl
@@ -47,6 +48,7 @@ namespace zgl
 		} m_projectionParams;
 
 
+		FrameBuffer framebuffer;
 		/**
 		 * Frustrum
 		 */
@@ -85,7 +87,6 @@ namespace zgl
 		}
 
 		inline auto getViewMatrix() const {
-			//assert(glm::abs(glm::length(getRotorOrientation()) - 1.0f) < 0.0001f);
 			glm::mat4 rotationMatrix = glm::mat4_cast(glm::conjugate(this->getRotorOrientation()));
 			glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), -this->getPosition());
 			return rotationMatrix * translationMatrix;

@@ -49,10 +49,10 @@ set(TOOLS_DIR "tools")	# Directory for developers tool in the forme of scriptes.
 ###########################
 ### COMPILATION OPTIONS ###
 ###########################
-#add_compile_options(-g -Wall -Wextra -pedantic -Werror)
-#add_compile_options(-g -Wall -Wextra -pedantic -Werror -Wconversion -Wuninitialized)
-add_compile_options(-g -Wall -Wextra -pedantic -Werror -Wconversion -Wshadow -Wuninitialized)
-#add_compile_options(-g -Wall -Wextra -pedantic -Werror -Wconversion -Wshadow -Wuninitialized -Wno-unused-parameter)
+#add_compile_options(-ggdb -Wall -Wextra -pedantic -Werror)
+#add_compile_options(-ggdb -Wall -Wextra -pedantic -Werror -Wconversion -Wuninitialized)
+add_compile_options(-ggdb -Wall -Wextra -pedantic -Werror -Wconversion -Wshadow -Wuninitialized)
+#add_compile_options(-ggdb -Wall -Wextra -pedantic -Werror -Wconversion -Wshadow -Wuninitialized -Wno-unused-parameter)
 
 
 ##############
