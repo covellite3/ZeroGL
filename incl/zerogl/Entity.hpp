@@ -94,9 +94,11 @@ namespace zgl
 
 		inline void lookAt(const glm::vec3& where, const glm::vec3& up)
 		{
-			//m_orientation = glm::quat_cast(glm::lookAt(m_position, where, up));
 			glm::mat4 viewMatrix = glm::lookAt(m_position, where, up);
-			m_orientation = glm::quat_cast(glm::inverse(viewMatrix));
+			// We use glm::transpose instead of glm::inverse
+			// because it's equivalent for pure rotation matrices,
+			// and much faster.
+			m_orientation = glm::quat_cast(glm::transpose(viewMatrix));
 		}
 
 		/**
