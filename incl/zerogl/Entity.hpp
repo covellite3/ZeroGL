@@ -167,6 +167,9 @@ namespace zgl
 			rotateRadianAroundPivot(glm::radians(degree), getBackVector());
 		}
 
+		/** Entity direction, actually the front vector */
+		inline auto getDirection() const { return -this->getBackVector(); }
+
 
 		inline auto getPosition() const
 		{

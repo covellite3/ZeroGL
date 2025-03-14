@@ -31,13 +31,22 @@ namespace zgl
 		loc = m_shaderProgram->getUniformLocation("u_projMat");
 		m_shaderProgram->setUniformMatrix(loc, projMat);
 
+		// Camera
+		loc = m_shaderProgram->getUniformLocation("u_positionCamera");
+		m_shaderProgram->setUniformMatrix(loc, camera.getPosition());
+
+		/*loc = m_shaderProgram->getUniformLocation("u_directionCamera");
+		m_shaderProgram->setUniformMatrix(loc, -camera.getDirection());*/
+
+
+
 		// Light
 		loc = m_shaderProgram->getUniformLocation("u_colorLight");
 		m_shaderProgram->setUniformMatrix(loc, scene.getLight()->getLightColor());
 		loc = m_shaderProgram->getUniformLocation("u_coordLight");
 		m_shaderProgram->setUniformMatrix(loc, scene.getLight()->getPosition());
 		loc = m_shaderProgram->getUniformLocation("u_directionLight");
-		m_shaderProgram->setUniformMatrix(loc, scene.getLight()->getLightDirection());
+		m_shaderProgram->setUniformMatrix(loc, -scene.getLight()->getDirection());
 
 		// Texture
 

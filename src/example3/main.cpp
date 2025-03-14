@@ -153,11 +153,6 @@ void init()
 	light = std::make_shared<Light>();
 	light->setPosition(glm::vec3(0,10,0));
 	light->lookAt(glm::vec3(0,-1,-10), glm::vec3(0,1,0));
-	glm::vec3 position = light->getPosition();
-	std::cout << "Light Position: (" << position.x << ", " << position.y << ", " << position.z << ")\n";
-	glm::vec3 lightDirection = light->getLightDirection();
-	std::cout << "Light Direction: (" << lightDirection.x << ", " << lightDirection.y << ", " << lightDirection.z << ")\n";
-
 
 	// Scene
 	std::cout << "Scene" << std::endl;

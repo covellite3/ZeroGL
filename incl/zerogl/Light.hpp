@@ -27,9 +27,6 @@ namespace zgl
 	public:
 		/** Light color */
 		inline auto getLightColor() const { return m_lightColor; }
-
-		/** Light direction is entity front vector */
-		inline auto getLightDirection() const { return -this->getBackVector(); }
 		//inline auto getShadownMap() { return m_; }
 		
 	}; // End class Light
