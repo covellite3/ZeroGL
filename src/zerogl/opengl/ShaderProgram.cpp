@@ -217,4 +217,28 @@ namespace zgl
 		}
 	}
 
+	std::shared_ptr<ShaderProgram> ShaderProgram::make(const std::string& name)
+	{
+		auto shaderProgram = std::make_shared<ShaderProgram>();
+		shaderProgram->init();
+		shaderProgram->loadFromFile(GL_VERTEX_SHADER, "assets/lib/std/"+name+"VertexShader.glsl");
+		shaderProgram->loadFromFile(GL_FRAGMENT_SHADER, "assets/lib/std/"+name+"FragmentShader.glsl");
+		zglCheckOpenGL();
+		if (!shaderProgram->compile()) {
+			std::ostringstream errorStream;
+			shaderProgram->showErrors(errorStream);
+			throw std::runtime_error(
+				"\033[31mSTD::\033[33m" + name + "\033[31m::\033[0m" + errorStream.str()
+			);
+		}
+		if (!shaderProgram->link()) {
+			std::ostringstream errorStream;
+			shaderProgram->showErrors(errorStream);
+			throw std::runtime_error(
+				"\033[31mSTD::\033[33m" + name + "\033[31m::\033[0m" + errorStream.str()
+			);
+		}
+		return shaderProgram;
+	}
+
 } // End namespace zgl

@@ -39,6 +39,9 @@ namespace zgl
 			m_shaderProgram = t_shaderProgram;
 		}
 
+		/** Make a shader program from assets/lib/std/ of given name. */
+		static std::shared_ptr<Renderer> make(const std::string& name);
+
 	}; // End class Renderer
 
 } // End namespace zgl

@@ -9,10 +9,14 @@
 
 // Includes
 #include "zerogl/opengl/OpenGL.hpp"
+#include <memory>
 // End includes
 
 namespace zgl
 {
+	class ShaderProgram;
+	class Renderer;
+
 	/**
 	 * @author: Corentin Asso
 	 * @date: 2023-02-04
@@ -23,6 +27,7 @@ namespace zgl
 	private:
 	protected:
 	public:
+
 	}; // End class ZeroGL
 
 } // End namespace zgl

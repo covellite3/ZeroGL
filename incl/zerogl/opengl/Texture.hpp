@@ -49,6 +49,8 @@ namespace zgl
 		inline auto isInit() const { return m_handle != 0; }
 		inline auto getHandle() const { return m_handle; }
 
+		static std::shared_ptr<Texture> make(const std::string& name);
+
 	}; // End class Texture
 
 } // End namespace zgl

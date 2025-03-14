@@ -47,6 +47,7 @@ namespace zgl
 			throw std::runtime_error("Texture already initialized.");
 		}
 
+		// TODO doesn't work as intended in case of error, I need to fix this
 		sf::Image image;
 		if(!image.loadFromFile(filePath)) return false;
 
@@ -71,6 +72,17 @@ namespace zgl
 		std::cout << "[Texture !] Init <" << m_handle << "> <- '"  << filePath << "'" << std::endl;
 		
 		return true;
+	}
+
+
+	std::shared_ptr<Texture> Texture::make(const std::string& name)
+	{
+		std::string filepath = "assets/textures/"+name+".png";
+		auto tex = std::make_shared<zgl::Texture>();
+		if (!tex->loadFromFile(filepath, GL_REPEAT, GL_NEAREST, GL_NEAREST)) {
+			std::runtime_error("ERROR::TEXTURE : Could not load image at '"+filepath+"'");
+		}
+		return tex;
 	}
 
 } // End namespace zgl

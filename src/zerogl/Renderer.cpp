@@ -68,4 +68,13 @@ namespace zgl
 		model.getMesh().draw(*m_shaderProgram.get());
 	}
 
+
+	std::shared_ptr<Renderer> Renderer::make(const std::string& name)
+	{
+		auto shaderProgram = ShaderProgram::make(name);
+		auto renderer = std::make_shared<Renderer>();
+		renderer->setShaderProgram(shaderProgram);
+		return renderer;
+	}
+
 } // End namespace zgl

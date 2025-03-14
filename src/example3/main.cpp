@@ -22,14 +22,11 @@ using namespace zgl;
 
 sf::Window window;
 Scene scene;
-std::shared_ptr<zgl::Texture> tex1, tex2;
-std::shared_ptr<ShaderProgram> shaderProgram;
 std::shared_ptr<Light> light;
 std::shared_ptr<Entity> entity;
 std::shared_ptr<Entity> screen;
 std::shared_ptr<Entity> ground;
 std::shared_ptr<Camera> camera;
-std::shared_ptr<Renderer> renderer;
 std::shared_ptr<FrameBuffer> framebuffer;
 
 void init()
@@ -64,50 +61,22 @@ void init()
 		std::cerr << "GLEW initialization failed!" << std::endl;
 		exit(EXIT_FAILURE);
 	}
+
+	zglCheckOpenGL();
 	glEnable(GL_DEBUG_OUTPUT);
-	zglCheckOpenGL();
 	glEnable(GL_DEPTH_TEST);
-	zglCheckOpenGL();
 	glEnable(GL_CULL_FACE); 
-	zglCheckOpenGL();
 	glCullFace(GL_FRONT);
 	zglCheckOpenGL();
 
-	// Shader
-	shaderProgram = std::make_shared<ShaderProgram>();
-	shaderProgram->init();
-	shaderProgram->loadFromFile(GL_VERTEX_SHADER, "assets/lib/std/basicVertexShader.glsl");
-	shaderProgram->loadFromFile(GL_FRAGMENT_SHADER, "assets/lib/std/basicFragmentShader.glsl");
-	zglCheckOpenGL();
-	if (!shaderProgram->compile()) {
-		shaderProgram->showErrors(std::cout);
-		exit(EXIT_FAILURE);
-	}
-	if (!shaderProgram->link()) {
-		shaderProgram->showErrors(std::cout);
-		exit(EXIT_FAILURE);
-	}
+	//////
+	//////
+	//////
 
-	// Texture
-	tex1 = std::make_shared<zgl::Texture>();
-	if (!tex1->loadFromFile("assets/textures/dirt.png", GL_REPEAT, GL_NEAREST, GL_NEAREST)) {
-		std::cerr << "Could no load image" << std::endl;
-		exit(EXIT_FAILURE);
-	}
+	auto renderer = Renderer::make("basic");
+	auto tex1 = zgl::Texture::make("dirt");
+	auto tex2 = zgl::Texture::make("tex2");
 
-	// Texture
-	tex2 = std::make_shared<zgl::Texture>();
-	if (!tex2->loadFromFile("assets/textures/tex2.png", GL_REPEAT, GL_NEAREST, GL_NEAREST)) {
-		std::cerr << "Could no load image" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-
-	// Renderer
-	std::cout << "Scene" << std::endl;
-	renderer = std::make_shared<Renderer>();
-	renderer->setShaderProgram(shaderProgram);
-
-	// Entity
 	std::cout << "Entity" << std::endl;
 
 	auto mesh1 = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadCube()));
@@ -252,17 +221,16 @@ void loop()
 				}
 			}
 		}
+
+
+		camera->lookAt(glm::vec3(0,-1,0), glm::vec3(0,1,0));
+
 		framebuffer->bind();
 		scene.render(*camera);
 		framebuffer->unbind();
 		scene.render(*camera);
 
-		camera->lookAt(glm::vec3(0,-1,0), glm::vec3(0,1,0));
-
-
 		window.display();
-		//entity->setPosition(glm::vec3(0,0,-foo-2));
-		//entity->setRotorOrientation(glm::normalize(glm::quat(std::cos(foo), 0.5f, 0.5f, 1.0f)));
 		++iter_count;
 	}
 }

@@ -14,6 +14,8 @@
 
 namespace zgl
 {
+	class Camera;
+
 	/**
 	 * @author: Corentin Asso
 	 * @date: 2025-02-24

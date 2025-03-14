@@ -20,6 +20,7 @@ namespace zgl
 {
 	class Camera;
 	class Renderer;
+	class Entity;
 
 	//class Renderer;
 
