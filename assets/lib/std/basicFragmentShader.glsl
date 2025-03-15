@@ -24,6 +24,11 @@ vec3 colorifyVector(vec3 v)
 }
 
 void main() {
+
+	// Params
+	bool isSunLight = true;
+	float shadowmapBias = 0.0005f;
+
 	// Material
 	vec4 texColor = texture(u_tex, v_uv);
 	float ambient = 0.1f;
@@ -32,7 +37,6 @@ void main() {
 	float b = 0.005;	
 
 	// Blinn-Phong lighting
-	bool isSunLight = true;
 	vec3 directionLight;
 	float intensity;
 	if(isSunLight) {
@@ -58,18 +62,23 @@ void main() {
 	// Shadowmap 
 	float shadowness = 0.0f; // How much in the shadow
 	vec3 clipLightFragPos = v_lightFragPos.xyz / v_lightFragPos.w; // clip space
-	if(clipLightFragPos.z <= 1.0f) {
+	if(	clipLightFragPos.z <=  1.0f &&
+		clipLightFragPos.x <=  1.0f &&
+		clipLightFragPos.y <=  1.0f &&
+		clipLightFragPos.z >= -1.0f &&
+		clipLightFragPos.x >= -1.0f &&
+		clipLightFragPos.y >= -1.0f) {
 		// Inside the frustrum of the shadowmap's camera
 		vec3 shadowMapFragPos = (clipLightFragPos + 1.0f) / 2.0f; // Shift to range [0;1]
 		float shadowMapDepth = texture(u_shadowmap, shadowMapFragPos.xy).r;
-		if(shadowMapDepth > shadowMapFragPos.z) {
+		if(shadowMapFragPos.z > shadowMapDepth + shadowmapBias) {
 			shadowness = 1.0f;
 		}
 	}
 
 	// Fragment's color
 	//FragColor = vec3(totalLighting * texColor);
-	FragColor = vec3(totalLighting*shadowness * texColor);
+	FragColor = vec3(totalLighting*(1.0f-shadowness) * texColor);
 	//FragColor = vec3(v_uv, 1.0f);
 	//FragColor = vec3(shadowness);
 }
