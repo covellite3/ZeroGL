@@ -18,6 +18,7 @@ void main()
 	//v_positionCamera = vec3(u_modelMat * vec4(u_positionCamera, 1.0f));
 	v_fragPos = vec3(u_modelMat * vec4(a_position, 1.0f));
 	gl_Position = u_projMat * u_viewMat * vec4(v_fragPos, 1.0f);
+	//v_uv = vec2(a_uv.x, 1.0 - a_uv.y);
 	v_uv = a_uv;
 	v_normal = mat3(transpose(inverse(u_modelMat))) * a_normal; // TODO verify this line
 }

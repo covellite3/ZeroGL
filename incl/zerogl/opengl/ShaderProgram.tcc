@@ -57,6 +57,25 @@ namespace zgl
 	}
 
 	template<typename T>
+	void ShaderProgram::setUniform(const GLuint location, const T& uniform)
+	{
+		assert(m_status == LINKED);
+		zglCheckOpenGL();
+		bind(*this);
+		if constexpr (std::is_same<T, int>::value)
+			glUniform1i(location, uniform);
+		else if constexpr (std::is_same<T, float>::value)
+			glUniform1f(location, uniform);
+		else if constexpr (std::is_same<T, glm::vec3>::value)
+			glUniform3fv(location, 1, glm::value_ptr(uniform));
+		else if constexpr (std::is_same<T, glm::ivec3>::value)
+			glUniform3iv(location, 1, glm::value_ptr(uniform));
+		else
+			static_assert("Uniform type not supported by template.");
+		zglCheckOpenGL();
+	}
+
+	template<typename T>
 	void ShaderProgram::setUniformMatrix(const GLuint location, const T& uniform, GLboolean transpose)
 	{
 		assert(m_status == LINKED);
@@ -68,8 +87,6 @@ namespace zgl
 			glUniformMatrix3fv(location, 1, transpose, glm::value_ptr(uniform));
 		else if constexpr (std::is_same<T, glm::mat4>::value)
 			glUniformMatrix4fv(location, 1, transpose, glm::value_ptr(uniform));
-		else if constexpr (std::is_same<T, glm::vec3>::value)
-			glUniform3fv(location, 1, glm::value_ptr(uniform));
 		else
 			static_assert("Uniform type not supported by template.");
 		zglCheckOpenGL();

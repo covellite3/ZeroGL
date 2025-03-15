@@ -8,13 +8,13 @@ in vec3 v_fragPos;
 out vec3 FragColor;
 
 uniform sampler2D u_tex;
-uniform vec3 u_colorLight;
+uniform sampler2D u_shadowmap;
 uniform vec3 u_positionCamera;
+uniform vec3 u_colorLight;
 uniform vec3 u_coordLight;
-
 uniform vec3 u_directionLight;
-//uniform vec3 u_directionCamera;
-
+uniform float u_zNearLight;
+uniform float u_zFarLight;
 
 /** Put vector between [-1;1] into color space between [0;1] */
 vec3 colorifyVector(vec3 v)
@@ -22,15 +22,23 @@ vec3 colorifyVector(vec3 v)
 	return (v + vec3(1.0f))/2;
 }
 
+float linearizeDepth(sampler2D depthBuffer, vec2 uv, float zNear, float zFar)
+{
+	float depth = texture(depthBuffer, uv).x;
+	depth = (2.0f * zNear) / (zFar + zNear - depth * (zFar - zNear));
+	return depth;
+}
+
 void main() {
 	// Material
-	vec4 texColor = texture(u_tex, v_uv);
+	//vec4 texColor = texture(u_tex, v_uv);
+	vec4 texColor = vec4(sqrt(linearizeDepth(u_shadowmap, v_uv, u_zNearLight, u_zFarLight)));
 	float ambient = 0.1f;
 	float shininess = 20.f;
 	float a = 0.05;
 	float b = 0.005;
 	// Blinn-Phong lighting
-	bool isSunLight = false;
+	bool isSunLight = true;
 	vec3 directionLight;
 	float intensity;
 	if(isSunLight) {
@@ -56,5 +64,6 @@ void main() {
 
 	// Fragment's color
 	FragColor = vec3(totalLighting * texColor);
+	//FragColor = vec3(v_uv, 1.0f);
 }
 

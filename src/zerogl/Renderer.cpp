@@ -33,21 +33,21 @@ namespace zgl
 
 		// Camera
 		loc = m_shaderProgram->getUniformLocation("u_positionCamera");
-		m_shaderProgram->setUniformMatrix(loc, camera.getPosition());
-
-		/*loc = m_shaderProgram->getUniformLocation("u_directionCamera");
-		m_shaderProgram->setUniformMatrix(loc, -camera.getDirection());*/
+		m_shaderProgram->setUniform(loc, camera.getPosition());
 
 		// Light
 		loc = m_shaderProgram->getUniformLocation("u_colorLight");
-		m_shaderProgram->setUniformMatrix(loc, scene.getLight()->getLightColor());
+		m_shaderProgram->setUniform(loc, scene.getLight()->getLightColor());
 		loc = m_shaderProgram->getUniformLocation("u_coordLight");
-		m_shaderProgram->setUniformMatrix(loc, scene.getLight()->getPosition());
+		m_shaderProgram->setUniform(loc, scene.getLight()->getPosition());
 		loc = m_shaderProgram->getUniformLocation("u_directionLight");
-		m_shaderProgram->setUniformMatrix(loc, -scene.getLight()->getDirection());
+		m_shaderProgram->setUniform(loc, -scene.getLight()->getDirection());
+		loc = m_shaderProgram->getUniformLocation("u_zNearLight");
+		m_shaderProgram->setUniform(loc, scene.getLight()->getNearPlane());
+		loc = m_shaderProgram->getUniformLocation("u_zFarLight");
+		m_shaderProgram->setUniform(loc, scene.getLight()->getFarPlane());
 
 		// Texture
-
 		loc = m_shaderProgram->getUniformLocation("u_tex");
 		if(model.getTexture() != nullptr)
 		{
@@ -61,8 +61,11 @@ namespace zgl
 		}
 		else std::runtime_error("Missing texture or framebuffer");
 
+		// Shadowmap
+		loc = m_shaderProgram->getUniformLocation("u_shadowmap");
+		m_shaderProgram->setUniformTexture(loc, scene.getLight()->getFramebuffer()->getDepthStencilHandle(), 1);
+
 		// Render mesh
-		
 		//std::cout << "[Renderer ? ] Draw mesh to FBO " << FrameBuffer::getBound() << std::endl;;
 		model.getMesh().draw(*m_shaderProgram.get());
 	}

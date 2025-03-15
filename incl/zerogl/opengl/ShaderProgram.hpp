@@ -144,6 +144,10 @@ namespace zgl
 
 		/** TODO comment */
 		template<typename T>
+		void setUniform(const GLuint location, const T& uniform);
+
+		/** TODO comment */
+		template<typename T>
 		void setUniformMatrix(const GLuint location, const T& uniform, GLboolean transpose=GL_FALSE);
 
 		/** TODO comment */

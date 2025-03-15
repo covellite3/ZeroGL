@@ -99,6 +99,14 @@ namespace zgl
 		inline auto getFramebuffer() {
 			return m_framebuffer;
 		}
+	
+		inline auto getNearPlane() const {
+			return m_projectionType == ProjectionType::Perspective ? m_projectionParams.perspective.nearPlane : m_projectionParams.orthographic.nearPlane;
+		}
+
+		inline auto getFarPlane() const {
+			return m_projectionType == ProjectionType::Perspective ? m_projectionParams.perspective.farPlane : m_projectionParams.orthographic.farPlane;
+		}
 	}; // End class Camera
 
 } // End namespace zgl
