@@ -25,17 +25,19 @@ vec3 colorifyVector(vec3 v)
 
 void main() {
 
-	// Params
-	bool isSunLight = true;
-	float paramBias = 0.000025f;
-	float minimumBias = 0.00005f;
+	// Params light
+	bool isSunLight = true; // Is matrix othro and parallel rays
+	float paramBias = 0.000025f; // Adaptative bias
+	float minimumBias = 0.00005f; // Minimum bias
+	int radius = 2;// Soft shadow
+	float a = 0.05; // Phong
+	float b = 0.005; // Phong
 
-	// Material
+	// Param Material
 	vec4 texColor = texture(u_tex, v_uv);
 	float ambient = 0.1f;
 	float shininess = 20.f;
-	float a = 0.05;
-	float b = 0.005;	
+
 
 	// Blinn-Phong lighting
 	vec3 directionLight;
@@ -58,10 +60,9 @@ void main() {
 		specular = pow(max(0.0f, dot(v_normal, halfvec)), shininess);
 	}
 
-	float totalLighting = (ambient + diffuse + specular)*intensity;
-
 	// Shadowmap 
 	float shadowness = 0.0f; // How much in the shadow
+	vec2 shadowMapPixelSize = 1.0 / textureSize(u_shadowmap, 0);
 	vec3 clipLightFragPos = v_lightFragPos.xyz / v_lightFragPos.w; // clip space
 	if(	clipLightFragPos.z <=  1.0f &&
 		clipLightFragPos.x <=  1.0f &&
@@ -71,16 +72,29 @@ void main() {
 		clipLightFragPos.y >= -1.0f) {
 		// Inside the frustrum of the shadowmap's camera
 		vec3 shadowMapFragPos = (clipLightFragPos + 1.0f) / 2.0f; // Shift to range [0;1]
-		float shadowMapDepth = texture(u_shadowmap, shadowMapFragPos.xy).r;
 		float bias = max(paramBias * (1.0f - dot(v_normal, directionLight)), minimumBias);
-		if(shadowMapFragPos.z > shadowMapDepth + bias) {
-			shadowness = 1.0f;
+		// Soft shadow
+		for(int y = -radius; y <= radius; ++y)
+		{
+			for(int x = -radius; x <= radius; ++x)
+			{
+				float shadowMapDepth = texture(u_shadowmap, shadowMapFragPos.xy + vec2(x, y)*shadowMapPixelSize).r;
+				if(shadowMapFragPos.z > shadowMapDepth + bias) {
+					shadowness += 1.0f;
+				}
+
+			}
 		}
+		shadowness /= pow((radius*2 + 1), 2);
 	}
+
+	//float totalLighting = (ambient + diffuse + specular)*intensity;
+	//float totalLighting = (ambient + diffuse + specular)*intensity*(1.0f-shadowness);
+	float totalLighting = max(ambient, (diffuse + specular)*intensity*(1.0f-shadowness));
 
 	// Fragment's color
 	//FragColor = vec3(totalLighting * texColor);
-	FragColor = vec3(totalLighting*(1.0f-shadowness) * texColor);
+	FragColor = vec3(totalLighting * texColor);
 	//FragColor = vec3(v_uv, 1.0f);
 	//FragColor = vec3(shadowness);
 }
