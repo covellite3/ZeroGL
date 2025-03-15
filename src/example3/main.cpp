@@ -23,9 +23,6 @@ using namespace zgl;
 sf::Window window;
 Scene scene;
 std::shared_ptr<Light> light;
-std::shared_ptr<Entity> entity;
-std::shared_ptr<Entity> screen;
-std::shared_ptr<Entity> ground;
 std::shared_ptr<Camera> camera;
 
 void init()
@@ -86,12 +83,12 @@ void init()
 	// Light
 	std::cout << "Light" << std::endl;
 	light = std::make_shared<Light>();
-	light->setPosition(glm::vec3(2.5,5,4));
+	light->setPosition(glm::vec3(25, 50, 40));
 	light->lookAt(glm::vec3(0,0,0), glm::vec3(0,1,0));
 
 	light->setPerspective(glm::radians(45.0f), 1.0, 0.1f, 1000.0f);
 	light->setFramebuffer(std::make_shared<FrameBuffer>());
-	light->getFramebuffer()->init(0, 0, 1024, 1024);
+	light->getFramebuffer()->init(0, 0, 2048, 2048);
 	light->getFramebuffer()->attachTexture(); // TODO remove color attachment for shadowmap
 	light->getFramebuffer()->attachDepthStencil();
 
@@ -103,8 +100,7 @@ void init()
 	model1->setMesh(mesh1);
 	model1->setTexture(tex1);
 	auto component1 = std::static_pointer_cast<zgl::Component>(model1);
-
-	entity = std::make_shared<Entity>(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	auto entity = std::make_shared<Entity>(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	entity->attachComponent(Component::Key::MODEL, component1);
 	entity->attachComponent(Component::Key::RENDERER_0, basicRenderer);
 	entity->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
@@ -114,7 +110,7 @@ void init()
 	model2->setMesh(mesh2);
 	model2->setTexture(tex2);
 	auto component2 = std::static_pointer_cast<zgl::Component>(model2);
-	ground = std::make_shared<Entity>(glm::vec3(0.0f, -4.0f, 0.0f), glm::vec3(15.0f, 1.f, 15.f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	auto ground = std::make_shared<Entity>(glm::vec3(0.0f, -4.0f, 0.0f), glm::vec3(15.0f, 1.f, 15.f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	ground->attachComponent(Component::Key::MODEL, component2);
 	ground->attachComponent(Component::Key::RENDERER_0, basicRenderer);
 	ground->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
@@ -124,10 +120,22 @@ void init()
 	modelQuad->setMesh(meshQuad);
 	modelQuad->setFramebuffer(light->getFramebuffer());
 	auto componentQuad = std::static_pointer_cast<zgl::Component>(modelQuad);
-	screen = std::make_shared<Entity>(glm::vec3(0.0f, 0.5f, -2.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	auto screen = std::make_shared<Entity>(glm::vec3(0.0f, 1.5f, -2.0f), glm::vec3(3.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	screen->attachComponent(Component::Key::MODEL, componentQuad);
 	screen->attachComponent(Component::Key::RENDERER_0, basicRenderer);
 	screen->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
+
+	auto meshCylinder = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadAnimatedCylinder(100, 10, 2)));
+	auto modelCylinder = std::make_shared<Model>();
+	modelCylinder->setMesh(meshCylinder);
+	modelCylinder->setTexture(tex1);
+	auto componentCylinder = std::static_pointer_cast<zgl::Component>(modelCylinder);
+	auto cylinder = std::make_shared<Entity>(glm::vec3(4.0f, -1.0f, 0.0f), glm::vec3(0.1f, 0.1f, 5.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	cylinder->attachComponent(Component::Key::MODEL, componentCylinder);
+	cylinder->attachComponent(Component::Key::RENDERER_0, basicRenderer);
+	cylinder->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
+
+
 
 	// Scene
 	std::cout << "Scene" << std::endl;
@@ -137,6 +145,7 @@ void init()
 	scene.add(entity);
 	scene.add(ground);
 	scene.add(screen);
+	scene.add(cylinder);
 
 	std::cout << "[MAIN] Done init" << std::endl;
 }

@@ -26,6 +26,10 @@ namespace zgl
 		static Mesh loadTriangle();
 		static Mesh loadQuad();
 		static Mesh loadCube();
+		static Mesh loadAnimatedCylinder(
+				size_t nbrCircleSegments,
+				size_t nbrRadialSegments,
+				size_t nbrOfBones);
 	}; // End class Loader3D
 
 } // End namespace zgl

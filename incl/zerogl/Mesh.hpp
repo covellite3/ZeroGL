@@ -35,6 +35,13 @@ namespace zgl
 		uint8_t m_nAttributes;
 		uint32_t m_count;
 
+		/**
+		 * GL_TRIANGLES
+		 * GL_TRIANGLE_STRIP
+		 * ...
+		 */
+		GLenum m_mode;
+
 		///
 		/// Send
 		///
@@ -164,7 +171,7 @@ namespace zgl
 		Mesh& operator=(const Mesh& other) = delete;
 		Mesh& operator=(Mesh&& other);
 
-		void init(uint8_t t_nAttributes, bool t_useIndex);
+		void init(const uint8_t t_nAttributes, const bool t_useIndex, const GLenum t_mode);
 
 		void send(const std::span<float>& position, const std::span<float>& normal, const std::span<float>& uv, const std::span<IndexType>& indices);
 
@@ -197,7 +204,7 @@ namespace zgl
 
 
 
-		inline void draw(const ShaderProgram& shader, GLenum mode=GL_TRIANGLES) const
+		inline void draw(const ShaderProgram& shader) const
 		{
 			assert(this->isInit());
 			assert(this->m_count > 0);
@@ -212,9 +219,9 @@ namespace zgl
 				else if constexpr(std::is_same<IndexType, GLushort>::value) type = GL_UNSIGNED_SHORT;
 				else if constexpr(std::is_same<IndexType, GLuint>::value) type = GL_UNSIGNED_INT;
 				else static_assert("Mesh's index's typeIndex must be an unsigned integer.");
-				glDrawElements(mode, static_cast<GLuint>(this->m_count), type, 0);
+				glDrawElements(m_mode, static_cast<GLuint>(this->m_count), type, 0);
 			} else {
-				glDrawArrays(mode, 0, static_cast<GLuint>(this->m_count));
+				glDrawArrays(m_mode, 0, static_cast<GLuint>(this->m_count));
 			}
 			zglCheckOpenGL();	
 		}

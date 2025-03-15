@@ -10,7 +10,7 @@
 namespace zgl
 {
 	Mesh::Mesh()
-		: m_vbo(0), m_ebo(0), m_vao(0), m_useIndex(false), m_nAttributes(0), m_count(0)
+		: m_vbo(0), m_ebo(0), m_vao(0), m_useIndex(false), m_nAttributes(0), m_count(0), m_mode(0)
 	{
 		std::cout << "[Mesh + ] New empty Mesh" << std::endl;
 	}
@@ -36,6 +36,7 @@ namespace zgl
 		zglCheckOpenGL();
 		m_vao = 0;
 		m_count = 0;
+		m_mode = 0;
 		
 	}
 
@@ -48,6 +49,7 @@ namespace zgl
 		this->m_useIndex = other.m_useIndex;
 		this->m_nAttributes = other.m_nAttributes;
 		this->m_count = other.m_count;
+		this->m_mode = other.m_mode;
 
 		// Cleanup
 		other.m_vbo = 0;
@@ -56,6 +58,7 @@ namespace zgl
 		other.m_useIndex = false;
 		other.m_nAttributes = 0;
 		other.m_count = 0;
+		other.m_mode = 0;
 	}
 
 
@@ -76,6 +79,7 @@ namespace zgl
 		zglCheckOpenGL();
 		m_vao = 0;
 		m_count = 0;
+		m_mode = 0;
 		// Extract other mesh
 		std::cout << "[Mesh = ] Assign Mesh" << std::endl;
 		if (this != &other) {
@@ -85,6 +89,7 @@ namespace zgl
 			this->m_useIndex = other.m_useIndex;
 			this->m_nAttributes = other.m_nAttributes;
 			this->m_count = other.m_count;
+			this->m_mode = other.m_mode;
 			// Empty other
 			other.m_vao = 0;
 			other.m_vbo = 0;
@@ -93,11 +98,12 @@ namespace zgl
 		return *this;
 	}
 
-	void Mesh::init(uint8_t t_nAttributes, bool t_useIndex)
+	void Mesh::init(const uint8_t t_nAttributes, const bool t_useIndex, const GLenum t_mode)
 	{
 		assert(!this->isInit());
 		this->m_nAttributes = t_nAttributes;
 		this->m_useIndex = t_useIndex;
+		this->m_mode = t_mode;
 		std::cout << "[Mesh ! ] Create VAO" << std::endl;
 		glGenVertexArrays(1, &this->m_vao);
 		std::cout << "[Mesh ! ] Binding VAO " << this->m_vao <<  std::endl;
