@@ -86,7 +86,7 @@ void init()
 	// Light
 	std::cout << "Light" << std::endl;
 	light = std::make_shared<Light>();
-	light->setPosition(glm::vec3(50,100,80));
+	light->setPosition(glm::vec3(2.5,5,4));
 	light->lookAt(glm::vec3(0,0,0), glm::vec3(0,1,0));
 
 	light->setPerspective(glm::radians(45.0f), 1.0, 0.1f, 1000.0f);
