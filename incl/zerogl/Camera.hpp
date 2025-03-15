@@ -47,7 +47,7 @@ namespace zgl
 			} orthographic;
 		} m_projectionParams;
 
-		FrameBuffer framebuffer;
+		std::shared_ptr<FrameBuffer> m_framebuffer;
 		/**
 		 * Frustrum
 		 */
@@ -55,7 +55,7 @@ namespace zgl
 
 	protected:
 	public:
-		inline Camera() : m_projectionType(ProjectionType::Perspective) {
+		inline Camera() : m_projectionType(ProjectionType::Perspective), m_framebuffer(nullptr) {
 			m_projectionParams.perspective = { glm::radians(45.0f), 1.0f, 0.1f, 100.0f };
 		}
 
@@ -89,6 +89,15 @@ namespace zgl
 			glm::mat4 rotationMatrix = glm::mat4_cast(glm::conjugate(this->getRotorOrientation()));
 			glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), -this->getPosition());
 			return rotationMatrix * translationMatrix;
+		}
+
+		inline void setFramebuffer(std::shared_ptr<FrameBuffer> t_framebuffer)
+		{
+			m_framebuffer = t_framebuffer;
+		}
+
+		inline auto getFramebuffer() {
+			return m_framebuffer;
 		}
 	}; // End class Camera
 

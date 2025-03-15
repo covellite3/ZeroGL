@@ -38,8 +38,6 @@ namespace zgl
 		/*loc = m_shaderProgram->getUniformLocation("u_directionCamera");
 		m_shaderProgram->setUniformMatrix(loc, -camera.getDirection());*/
 
-
-
 		// Light
 		loc = m_shaderProgram->getUniformLocation("u_colorLight");
 		m_shaderProgram->setUniformMatrix(loc, scene.getLight()->getLightColor());
@@ -53,18 +51,19 @@ namespace zgl
 		loc = m_shaderProgram->getUniformLocation("u_tex");
 		if(model.getTexture() != nullptr)
 		{
-			//std::cout << "[Renderer ?] Model as texture: " << model.getTexture()->getHandle() << std::endl;
+			std::cout << "[Renderer ? ] Model as texture: " << model.getTexture()->getHandle() << std::endl;
 			m_shaderProgram->setUniformTexture(loc, model.getTexture()->getHandle(), 0);
 		}
 		else if(model.getFramebuffer() != nullptr)
 		{
-			//std::cout << "[Renderer ?] Model as framebuffer: " << model.getFramebuffer()->getTextureHandle() << std::endl;
+			std::cout << "[Renderer ? ] Model as framebuffer: " << model.getFramebuffer()->getTextureHandle() << std::endl;
 			m_shaderProgram->setUniformTexture(loc, model.getFramebuffer()->getTextureHandle(), 0);
 		}
 		else std::runtime_error("Missing texture or framebuffer");
 
 		// Render mesh
 		
+		std::cout << "[Renderer ? ] Draw mesh to FBO " << FrameBuffer::getBound() << std::endl;;
 		model.getMesh().draw(*m_shaderProgram.get());
 	}
 

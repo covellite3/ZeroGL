@@ -42,10 +42,10 @@ namespace zgl
 
 
 		inline auto getTexture() { return m_texture.get(); }
-		inline void setTexture(std::shared_ptr<Texture>& t_texture) { m_texture = t_texture; }
+		inline void setTexture(std::shared_ptr<Texture> t_texture) { m_texture = t_texture; }
 		
 		inline auto getFramebuffer() { return m_framebuffer.get(); }
-		inline void setFramebuffer(std::shared_ptr<FrameBuffer>& t_framebuffer) { m_framebuffer = t_framebuffer; }
+		inline void setFramebuffer(std::shared_ptr<FrameBuffer> t_framebuffer) { m_framebuffer = t_framebuffer; }
 		
 
 		//Model(Mesh&& t_mesh, Material&& t_material, Skeleton&& m_Skeleton);

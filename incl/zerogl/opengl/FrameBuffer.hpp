@@ -58,6 +58,14 @@ namespace zgl
 		/** Init framebuffer */
 		void init(GLint x, GLuint y, GLsizei width, GLsizei height);
 
+		inline static GLuint getBound()
+		{
+			GLint currentFBO;
+			glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO);
+			zglCheckOpenGL();
+			return (GLuint)currentFBO;
+		}
+
 		/** Bind the framebuffer */
 		inline void bind() const
 		{

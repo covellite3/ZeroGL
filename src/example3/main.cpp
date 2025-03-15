@@ -27,7 +27,6 @@ std::shared_ptr<Entity> entity;
 std::shared_ptr<Entity> screen;
 std::shared_ptr<Entity> ground;
 std::shared_ptr<Camera> camera;
-std::shared_ptr<FrameBuffer> framebuffer;
 
 void init()
 {
@@ -73,11 +72,30 @@ void init()
 	//////
 	//////
 
+	// Assets
 	auto shadowmapRenderer = Renderer::make("shadowmap");
 	auto basicRenderer = Renderer::make("basic");
 	auto tex1 = zgl::Texture::make("dirt");
 	auto tex2 = zgl::Texture::make("tex2");
 
+	// Camera
+	std::cout << "Camera" << std::endl;
+	camera = std::make_shared<Camera>();
+	camera->setPosition(glm::vec3(0,0,10));
+
+	// Light
+	std::cout << "Light" << std::endl;
+	light = std::make_shared<Light>();
+	light->setPosition(glm::vec3(50,100,80));
+	light->lookAt(glm::vec3(0,0,0), glm::vec3(0,1,0));
+
+	light->setPerspective(glm::radians(45.0f), 1.0, 0.1f, 1000.0f);
+	light->setFramebuffer(std::make_shared<FrameBuffer>());
+	light->getFramebuffer()->init(0, 0, 1024, 1024);
+	light->getFramebuffer()->attachTexture();
+	light->getFramebuffer()->attachDepthStencil();
+
+	// Entities
 	std::cout << "Entity" << std::endl;
 
 	auto mesh1 = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadCube()));
@@ -103,35 +121,18 @@ void init()
 
 	auto meshQuad = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadQuad()));
 	auto modelQuad = std::make_shared<Model>();
-	framebuffer = std::make_shared<FrameBuffer>();
-	framebuffer->init(0, 0, 1024, 1024);
-	framebuffer->attachTexture();
-	framebuffer->attachDepthStencil();
-	framebuffer->unbind();
 	modelQuad->setMesh(meshQuad);
-	modelQuad->setFramebuffer(framebuffer);
+	modelQuad->setFramebuffer(light->getFramebuffer());
 	auto componentQuad = std::static_pointer_cast<zgl::Component>(modelQuad);
-
 	screen = std::make_shared<Entity>(glm::vec3(0.0f, 0.5f, -2.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	screen->attachComponent(Component::Key::MODEL, componentQuad);
 	screen->attachComponent(Component::Key::RENDERER_0, basicRenderer);
 	screen->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
 
-	// Camera
-	std::cout << "Camera" << std::endl;
-	camera = std::make_shared<Camera>();
-	camera->setPosition(glm::vec3(0,0,10));
-
-	// Light
-	std::cout << "Light" << std::endl;
-	light = std::make_shared<Light>();
-	light->setPosition(glm::vec3(50,100,80));
-	light->lookAt(glm::vec3(0,0,0), glm::vec3(0,1,0));
-
 	// Scene
 	std::cout << "Scene" << std::endl;
 	scene.setSkyColor(Component::Key::RENDERER_0, glm::vec3(0.5f, 0.5f, 1.0f));
-	scene.setSkyColor(Component::Key::RENDERER_1, glm::vec3(0.0f, 0.0f, 0.0f));
+	scene.setSkyColor(Component::Key::RENDERER_1, glm::vec3(1.0f, 0.0f, 0.0f));
 	scene.setLight(light);
 	scene.add(entity);
 	scene.add(ground);
@@ -182,7 +183,7 @@ void loop()
 				auto height = resized->size.y;
 				std::cout << "[EVENT] Resized window " << width << "x" << height << std::endl;
 				FrameBuffer::setWindowViewport(0, 0, width, height);
-				camera->setPerspective(glm::radians(45.0f), (float)width/(float)height, 0.1f, 100.0f);
+				camera->setPerspective(glm::radians(45.0f), (float)width/(float)height, 0.1f, 1000.0f);
 				// Get the center of the window
 				windowCenter = sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2);
 
@@ -229,14 +230,14 @@ void loop()
 
 
 		camera->lookAt(glm::vec3(0,-1,0), glm::vec3(0,1,0));
+		//camera->setRotorOrientation(light->getRotorOrientation());
+		//camera->setPosition(light->getPosition());
 
 
 		// Render shadow map
-		framebuffer->bind();
-		scene.render(Component::Key::RENDERER_1, *camera); // TODO change camera to light
+		scene.render(Component::Key::RENDERER_1, *light); 
 
 		// Render final scene
-		framebuffer->unbind();
 		scene.render(Component::Key::RENDERER_0, *camera);
 
 		window.display();
