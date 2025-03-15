@@ -1,9 +1,10 @@
 #version 330 core
-#include <assets/lib/std/incl/lighting.glsl>
+//#include <assets/lib/std/incl/lighting.glsl>
 
 in vec2 v_uv;
 in vec3 v_normal;
 in vec3 v_fragPos;
+in vec4 v_lightFragPos;
 
 out vec3 FragColor;
 
@@ -22,21 +23,14 @@ vec3 colorifyVector(vec3 v)
 	return (v + vec3(1.0f))/2;
 }
 
-float linearizeDepth(sampler2D depthBuffer, vec2 uv, float zNear, float zFar)
-{
-	float depth = texture(depthBuffer, uv).x;
-	depth = (2.0f * zNear) / (zFar + zNear - depth * (zFar - zNear));
-	return depth;
-}
-
 void main() {
 	// Material
-	//vec4 texColor = texture(u_tex, v_uv);
-	vec4 texColor = vec4(sqrt(linearizeDepth(u_shadowmap, v_uv, u_zNearLight, u_zFarLight)));
+	vec4 texColor = texture(u_tex, v_uv);
 	float ambient = 0.1f;
 	float shininess = 20.f;
 	float a = 0.05;
-	float b = 0.005;
+	float b = 0.005;	
+
 	// Blinn-Phong lighting
 	bool isSunLight = true;
 	vec3 directionLight;
@@ -60,10 +54,23 @@ void main() {
 	}
 
 	float totalLighting = (ambient + diffuse + specular)*intensity;
-	//float totalLighting = intensity;
+
+	// Shadowmap 
+	float shadowness = 0.0f; // How much in the shadow
+	vec3 clipLightFragPos = v_lightFragPos.xyz / v_lightFragPos.w; // clip space
+	if(clipLightFragPos.z <= 1.0f) {
+		// Inside the frustrum of the shadowmap's camera
+		vec3 shadowMapFragPos = (clipLightFragPos + 1.0f) / 2.0f; // Shift to range [0;1]
+		float shadowMapDepth = texture(u_shadowmap, shadowMapFragPos.xy).r;
+		if(shadowMapDepth > shadowMapFragPos.z) {
+			shadowness = 1.0f;
+		}
+	}
 
 	// Fragment's color
-	FragColor = vec3(totalLighting * texColor);
+	//FragColor = vec3(totalLighting * texColor);
+	FragColor = vec3(totalLighting*shadowness * texColor);
 	//FragColor = vec3(v_uv, 1.0f);
+	//FragColor = vec3(shadowness);
 }
 

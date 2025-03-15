@@ -92,7 +92,7 @@ void init()
 	light->setPerspective(glm::radians(45.0f), 1.0, 0.1f, 1000.0f);
 	light->setFramebuffer(std::make_shared<FrameBuffer>());
 	light->getFramebuffer()->init(0, 0, 1024, 1024);
-	//light->getFramebuffer()->attachTexture();
+	light->getFramebuffer()->attachTexture(); // TODO remove color attachment for shadowmap
 	light->getFramebuffer()->attachDepthStencil();
 
 	// Entities

@@ -21,7 +21,6 @@ namespace zgl
 		glm::mat4 projMat = camera.getProjectionMatrix();
 
 		// Model View Perpective
-
 		auto loc = m_shaderProgram->getUniformLocation("u_modelMat");
 		m_shaderProgram->setUniformMatrix(loc, modelMat);
 
@@ -46,6 +45,11 @@ namespace zgl
 		m_shaderProgram->setUniform(loc, scene.getLight()->getNearPlane());
 		loc = m_shaderProgram->getUniformLocation("u_zFarLight");
 		m_shaderProgram->setUniform(loc, scene.getLight()->getFarPlane());
+		loc = m_shaderProgram->getUniformLocation("u_lightProjMat");
+		auto lightProjMat = scene.getLight()->getProjectionMatrix() * scene.getLight()->getViewMatrix();
+		m_shaderProgram->setUniformMatrix(loc, lightProjMat);
+
+
 
 		// Texture
 		loc = m_shaderProgram->getUniformLocation("u_tex");
