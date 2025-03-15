@@ -33,15 +33,20 @@ namespace zgl
 	{
 	private:
 		std::vector<std::shared_ptr<Entity>> m_entities;
-		glm::vec3 m_skyColor;
 		std::shared_ptr<Light> m_light;
+
+		/** The given sky color for each renderer types */
+		std::unordered_map<Component::Key, glm::vec3> m_skyColors;
 	protected:
 	public:
-		void render(Camera& camera);
+		/**
+		 * rendererType: RENDERER_0, RENDERER_1, ...
+		 */
+		void render(const Component::Key& rendererType, Camera& camera);
 
 		inline void add(std::shared_ptr<Entity>& entity) { m_entities.push_back(entity); }
 
-		inline void setSkyColor(const glm::vec3& t_skyColor) { m_skyColor = t_skyColor; }
+		inline void setSkyColor(const Component::Key& rendererType, const glm::vec3& t_skyColor) { m_skyColors[rendererType] = t_skyColor; }
 
 		inline void setLight(std::shared_ptr<Light>& t_light) { m_light = t_light; }
 

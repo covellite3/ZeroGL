@@ -47,7 +47,6 @@ namespace zgl
 			} orthographic;
 		} m_projectionParams;
 
-
 		FrameBuffer framebuffer;
 		/**
 		 * Frustrum

@@ -25,7 +25,9 @@ namespace zgl
 		enum class Key
 		{
 			ENTITY,
-			RENDERER,
+			RENDERER_0,
+			RENDERER_1,
+			RENDERER_2,
 			MODEL,
 			SKELETON,
 			ANIMATION,

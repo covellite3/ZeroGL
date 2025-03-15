@@ -73,7 +73,8 @@ void init()
 	//////
 	//////
 
-	auto renderer = Renderer::make("basic");
+	auto shadowmapRenderer = Renderer::make("shadowmap");
+	auto basicRenderer = Renderer::make("basic");
 	auto tex1 = zgl::Texture::make("dirt");
 	auto tex2 = zgl::Texture::make("tex2");
 
@@ -87,7 +88,8 @@ void init()
 
 	entity = std::make_shared<Entity>(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	entity->attachComponent(Component::Key::MODEL, component1);
-	entity->attachComponent(Component::Key::RENDERER, renderer);
+	entity->attachComponent(Component::Key::RENDERER_0, basicRenderer);
+	entity->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
 
 	auto mesh2 = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadCube()));
 	auto model2 = std::make_shared<Model>();
@@ -96,7 +98,8 @@ void init()
 	auto component2 = std::static_pointer_cast<zgl::Component>(model2);
 	ground = std::make_shared<Entity>(glm::vec3(0.0f, -4.0f, 0.0f), glm::vec3(15.0f, 1.f, 15.f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	ground->attachComponent(Component::Key::MODEL, component2);
-	ground->attachComponent(Component::Key::RENDERER, renderer);
+	ground->attachComponent(Component::Key::RENDERER_0, basicRenderer);
+	ground->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
 
 	auto meshQuad = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadQuad()));
 	auto modelQuad = std::make_shared<Model>();
@@ -111,7 +114,8 @@ void init()
 
 	screen = std::make_shared<Entity>(glm::vec3(0.0f, 0.5f, -2.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	screen->attachComponent(Component::Key::MODEL, componentQuad);
-	screen->attachComponent(Component::Key::RENDERER, renderer);
+	screen->attachComponent(Component::Key::RENDERER_0, basicRenderer);
+	screen->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
 
 	// Camera
 	std::cout << "Camera" << std::endl;
@@ -126,7 +130,8 @@ void init()
 
 	// Scene
 	std::cout << "Scene" << std::endl;
-	scene.setSkyColor(glm::vec3(0.5f, 0.5f, 1.0f));
+	scene.setSkyColor(Component::Key::RENDERER_0, glm::vec3(0.5f, 0.5f, 1.0f));
+	scene.setSkyColor(Component::Key::RENDERER_1, glm::vec3(0.0f, 0.0f, 0.0f));
 	scene.setLight(light);
 	scene.add(entity);
 	scene.add(ground);
@@ -225,10 +230,14 @@ void loop()
 
 		camera->lookAt(glm::vec3(0,-1,0), glm::vec3(0,1,0));
 
+
+		// Render shadow map
 		framebuffer->bind();
-		scene.render(*camera);
+		scene.render(Component::Key::RENDERER_1, *camera); // TODO change camera to light
+
+		// Render final scene
 		framebuffer->unbind();
-		scene.render(*camera);
+		scene.render(Component::Key::RENDERER_0, *camera);
 
 		window.display();
 		++iter_count;
