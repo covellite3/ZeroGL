@@ -27,7 +27,8 @@ void main() {
 
 	// Params
 	bool isSunLight = true;
-	float shadowmapBias = 0.0005f;
+	float paramBias = 0.000025f;
+	float minimumBias = 0.00005f;
 
 	// Material
 	vec4 texColor = texture(u_tex, v_uv);
@@ -71,7 +72,8 @@ void main() {
 		// Inside the frustrum of the shadowmap's camera
 		vec3 shadowMapFragPos = (clipLightFragPos + 1.0f) / 2.0f; // Shift to range [0;1]
 		float shadowMapDepth = texture(u_shadowmap, shadowMapFragPos.xy).r;
-		if(shadowMapFragPos.z > shadowMapDepth + shadowmapBias) {
+		float bias = max(paramBias * (1.0f - dot(v_normal, directionLight)), minimumBias);
+		if(shadowMapFragPos.z > shadowMapDepth + bias) {
 			shadowness = 1.0f;
 		}
 	}
