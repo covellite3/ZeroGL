@@ -97,5 +97,6 @@ void main() {
 	FragColor = vec3(totalLighting * texColor);
 	//FragColor = vec3(v_uv, 1.0f);
 	//FragColor = vec3(shadowness);
+	//FragColor = colorifyVector(v_normal);
 }
 
