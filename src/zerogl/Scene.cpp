@@ -14,10 +14,10 @@ namespace zgl
 		// If camera has a valide framebuffer, we render to it otherwise we render to the default framebuffer (the screen)
 		if(camera.getFramebuffer() != nullptr && camera.getFramebuffer()->isInit()) {
 			camera.getFramebuffer()->bind();
-			std::cout << "Bound framebuffer " << FrameBuffer::getBound()  << std::endl;
+			//std::cout << "Bound framebuffer " << FrameBuffer::getBound()  << std::endl;
 		} else {
 			FrameBuffer::unbind();
-			std::cout << "Unbound framebuffer " << FrameBuffer::getBound() << std::endl;
+			//std::cout << "Unbound framebuffer " << FrameBuffer::getBound() << std::endl;
 		}
 
 		// We choose the correct sky color,
