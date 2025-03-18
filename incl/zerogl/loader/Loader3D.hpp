@@ -30,6 +30,12 @@ namespace zgl
 				size_t nbrCircleSegments,
 				size_t nbrRadialSegments,
 				size_t nbrOfBones);
+
+		static void calculateBoneWeights(
+				const std::vector<float>& positions,
+				const std::vector<float>& handles,
+				std::vector<float>& weights,
+				std::vector<uint32_t>& boneIndex);
 	}; // End class Loader3D
 
 } // End namespace zgl

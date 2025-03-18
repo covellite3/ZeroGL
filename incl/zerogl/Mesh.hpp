@@ -173,7 +173,11 @@ namespace zgl
 
 		void init(const uint8_t t_nAttributes, const bool t_useIndex, const GLenum t_mode);
 
+		/** Send none animated textured 3D mesh */
 		void send(const std::span<float>& position, const std::span<float>& normal, const std::span<float>& uv, const std::span<IndexType>& indices);
+
+		/** Send animated textured 3D mesh */
+		void send(const std::span<float>& position, const std::span<float>& normal, const std::span<float>& uv, const std::span<float>& boneWeights, const std::span<uint32_t>& boneIndices, const std::span<IndexType>& indices);
 
 		/*template <typename T, typename... Args>
 		inline void send(const size_t nComponents, const std::span<T>& attrib, Args... args)

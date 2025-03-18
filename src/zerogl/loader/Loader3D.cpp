@@ -130,25 +130,118 @@ namespace zgl
 
 
 
+
+	void Loader3D::calculateBoneWeights(
+		const std::vector<float>& positions,
+		const std::vector<float>& handles,
+		std::vector<float>& weights,
+		std::vector<uint32_t>& boneIndices)
+	{
+		assert(positions.size() % 3 == 0);
+		assert(handles.size() % 3 == 0);
+		assert(weights.empty());
+		assert(boneIndices.empty());
+
+		size_t nbrOfVertices = positions.size() / 3;
+		size_t nbrHandles = handles.size() / 3;
+
+		weights.resize(nbrOfVertices*3);
+		boneIndices.resize(nbrOfVertices*3);
+
+		for (size_t iVertex = 0; iVertex < nbrOfVertices; ++iVertex) {
+			int iFirstClosest = 0, iSecondClosest = 0, iThirdClosest = 0;
+			float distFirst = -1, distSecond = -1, distThird = -1;
+
+			// Get the position of the current vertex
+			float xVertex = positions[iVertex * 3];
+			float yVertex = positions[iVertex * 3 + 1];
+			float zVertex = positions[iVertex * 3 + 2];
+
+			for (size_t iHandle = 0; iHandle < nbrHandles; ++iHandle) {
+				// Get the position of the current handle
+				float xHandle = handles[iHandle * 3];
+				float yHandle = handles[iHandle * 3 + 1];
+				float zHandle = handles[iHandle * 3 + 2];
+
+				// Compute the distance between the vertex and the handle
+				float dist = static_cast<float>(std::sqrt(std::pow(xVertex - xHandle, 2) +
+									   std::pow(yVertex - yHandle, 2) +
+									   std::pow(zVertex - zHandle, 2)));
+
+				// Update the closest bones
+				if (distFirst == -1 || dist < distFirst) {
+					distThird = distSecond;
+					iThirdClosest = iSecondClosest;
+
+					distSecond = distFirst;
+					iSecondClosest = iFirstClosest;
+
+					distFirst = dist;
+					iFirstClosest = static_cast<int>(iHandle);
+				} else if (distSecond == -1 || dist < distSecond) {
+					distThird = distSecond;
+					iThirdClosest = iSecondClosest;
+
+					distSecond = dist;
+					iSecondClosest = static_cast<int>(iHandle);
+				} else if (distThird == -1 || dist < distThird) {
+					distThird = dist;
+					iThirdClosest = static_cast<int>(iHandle);
+				}
+			}
+
+			// Inverse distance weights
+			float totalDist = std::max(0.f, distFirst) + std::max(0.f, distSecond) + std::max(0.f, distThird);
+			assert(totalDist > 0);
+			std::cout
+				<< " total:" << totalDist
+				<< " first:" << distFirst
+				<< " second:" << distSecond
+				<< " third:" << distThird << std::endl;
+			if (totalDist > 0) {
+				weights[iVertex * 3] = std::max(0.f, distFirst) / totalDist;
+				weights[iVertex * 3 + 1] = std::max(0.f, distSecond) / totalDist;
+				weights[iVertex * 3 + 2] = std::max(0.f, distThird) / totalDist;
+			} else {
+				weights[iVertex * 3] = 0.0f;
+				weights[iVertex * 3 + 1] = 0.0f;
+				weights[iVertex * 3 + 2] = 0.0f;
+			}
+			std::cout
+				<< " " << weights[iVertex * 3]
+				<< " " << weights[iVertex * 3 + 1]
+				<< " " << weights[iVertex * 3 + 2]
+				<< std::endl <<  std::endl;
+			assert(std::abs(weights[iVertex * 3] + weights[iVertex * 3 + 1] + weights[iVertex * 3 + 2] - 1.0) <= 0.0001);
+
+			// Store the bone indices
+			boneIndices[iVertex * 3] = iFirstClosest;
+			boneIndices[iVertex * 3 + 1] = iSecondClosest;
+			boneIndices[iVertex * 3 + 2] = iThirdClosest;
+		}
+	}
+
 	
-	Mesh Loader3D::loadAnimatedCylinder(size_t nbrCircleSegments, size_t nbrRadialSegments, size_t nbrOfBones)
+	Mesh Loader3D::loadAnimatedCylinder(size_t nbrArcs, size_t nbrSections, size_t nbrOfBones)
 	{
 		(void)nbrOfBones; // TODO add skeleton
 		Mesh mesh;
-		mesh.init(/*t_nAttributes*/3, /*t_useIndex*/true, GL_TRIANGLE_STRIP);
+		mesh.init(/*t_nAttributes*/5, /*t_useIndex*/true, GL_TRIANGLE_STRIP);
 
-		float axleIncrement = 1.0f / static_cast<float>(nbrCircleSegments);
-		float phiIncrement = static_cast<float>((2.0 * M_PI) / static_cast<double>(nbrRadialSegments));
+		float axleIncrement = 1.0f / static_cast<float>(nbrSections);
+		float phiIncrement = static_cast<float>((2.0 * M_PI) / static_cast<double>(nbrArcs));
 
 		std::vector<float> positions;
 		std::vector<float> normals;
 		std::vector<float> uvs;
+		std::vector<float> weights;
+		std::vector<uint32_t> boneIndices;
 		std::vector<Mesh::IndexType> indices;
 
-		for (size_t iCircleSegment = 0; iCircleSegment <= nbrCircleSegments; ++iCircleSegment) {
-			float axlePos = static_cast<float>(iCircleSegment) * axleIncrement;
-			for (size_t iRadialSegment = 0; iRadialSegment <= nbrRadialSegments; ++iRadialSegment) {
-				float phi = static_cast<float>(iRadialSegment) * phiIncrement;
+		for (size_t iSection = 0; iSection <= nbrSections; ++iSection) {
+			float axlePos = static_cast<float>(iSection) * axleIncrement;
+			for (size_t iArcSegment = 0; iArcSegment <= nbrArcs; ++iArcSegment) {
+				float phi = static_cast<float>(iArcSegment) * phiIncrement;
 
 				// Position
 				float x = static_cast<float>(cos(static_cast<double>(phi)));
@@ -164,20 +257,20 @@ namespace zgl
 				normals.push_back(0.0f);
 
 				// UV
-				float u = static_cast<float>(iRadialSegment) / static_cast<float>(nbrRadialSegments);
+				float u = static_cast<float>(iArcSegment) / static_cast<float>(nbrArcs);
 				float v = axlePos;
 				uvs.push_back(u);
 				uvs.push_back(v);
 			}
 		}
 
-		for (size_t iCircleSegment = 0; iCircleSegment < nbrCircleSegments; ++iCircleSegment) {
-			for (size_t iRadialSegment = 0; iRadialSegment <= nbrRadialSegments; ++iRadialSegment) {
+		for (size_t iSection = 0; iSection < nbrSections; ++iSection) {
+			for (size_t iArcSegment = 0; iArcSegment <= nbrArcs; ++iArcSegment) {
 				Mesh::IndexType current = static_cast<Mesh::IndexType>(
-					iCircleSegment * (nbrRadialSegments + 1) + iRadialSegment
+					iSection * (nbrArcs + 1) + iArcSegment
 				);
 				Mesh::IndexType next = static_cast<Mesh::IndexType>(
-					(iCircleSegment + 1) * (nbrRadialSegments + 1) + iRadialSegment
+					(iSection + 1) * (nbrArcs + 1) + iArcSegment
 				);
 
 				indices.push_back(current);
@@ -185,11 +278,28 @@ namespace zgl
 			}
 		}
 
+		// Create bones
+		std::vector<float> handles;
+		auto handlesSpacing = 1.0f / static_cast<float>(nbrOfBones + 1);
+		//auto handlesSpacing = 1.0f / static_cast<float>(nbrOfBones);
+		for(size_t iBone = 0; iBone < nbrOfBones; ++iBone)
+		{
+			handles.push_back(0);
+			handles.push_back(0);
+			handles.push_back(static_cast<float>(iBone + 1)*handlesSpacing);
+			//handles.push_back(static_cast<float>(iBone)*handlesSpacing);
+		}
+
+		// Assign a weight to 3 bones for each vertices
+		calculateBoneWeights(positions, handles, weights, boneIndices);
+
 		mesh.send(
-			std::span<float>(positions.data(), positions.size()),           // POS
-			std::span<float>(normals.data(), normals.size()),               // NORMAL
-			std::span<float>(uvs.data(), uvs.size()),                       // UV
-			std::span<Mesh::IndexType>(indices.data(), indices.size())      // INDEX
+			std::span<float>(positions.data(), positions.size()),
+			std::span<float>(normals.data(), normals.size()),
+			std::span<float>(uvs.data(), uvs.size()),
+			std::span<float>(weights.data(), weights.size()),
+			std::span<uint32_t>(boneIndices.data(), boneIndices.size()),
+			std::span<Mesh::IndexType>(indices.data(), indices.size())
 		);
 
 		return mesh;

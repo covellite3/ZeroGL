@@ -26,6 +26,7 @@ vec3 colorifyVector(vec3 v)
 void main() {
 
 	// Params light
+	float ambient = 0.1f;
 	bool isSunLight = true; // Is matrix othro and parallel rays
 	float paramBias = 0.000025f; // Adaptative bias
 	float minimumBias = 0.00005f; // Minimum bias
@@ -35,7 +36,6 @@ void main() {
 
 	// Param Material
 	vec4 texColor = texture(u_tex, v_uv);
-	float ambient = 0.1f;
 	float shininess = 20.f;
 
 

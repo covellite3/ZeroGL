@@ -126,7 +126,7 @@ namespace zgl
 
 	void Mesh::send(const std::span<float>& position, const std::span<float>& normal, const std::span<float>& uv, const std::span<IndexType>& indices)
 	{
-		std::cout << "[Mesh ->] Mesh is sending attribute(s) " << (this->hasIndex() ? "and index" : "") << " to GPU" << std::endl;
+		std::cout << "[Mesh ->] None animated mesh is sending attribute(s) " << (this->hasIndex() ? "and index" : "") << " to GPU" << std::endl;
 
 		assert(this->isInit());
 		assert(hasIndex() && indices.size() > 0);
@@ -200,6 +200,90 @@ namespace zgl
 		zglCheckOpenGL();*/
 	}
 
+
+	void Mesh::send(const std::span<float>& position, const std::span<float>& normal, const std::span<float>& uv, const std::span<float>& boneWeights, const std::span<uint32_t>& boneIndices, const std::span<IndexType>& indices)
+	{
+		std::cout << "[Mesh ->] Animated mesh sending attributes " << (this->hasIndex() ? "and index" : "") << " to GPU" << std::endl;
+
+		assert(this->isInit());
+		assert(hasIndex() && indices.size() > 0);
+		glBindVertexArray(m_vao);
+		zglCheckOpenGL();
+
+		// Calculate total vertex count
+		if (hasIndex()) this->m_count = static_cast<uint32_t>(indices.size());
+		else this->m_count = static_cast<uint32_t>(position.size() / 3);
+
+		// Calculate stride (position + normal + uv + bone weights + bone indices)
+		GLsizei stride = sizeof(float) * (3 + 3 + 2 + 3) + sizeof(uint32_t) * 3;
+
+		// Create a buffer to hold interleaved data
+		std::vector<uint8_t> buffer(this->m_count * stride);
+
+		// Interleave position, normal, uv, bone weights, and bone indices
+		size_t offset = 0;
+		for (size_t i = 0; i < this->m_count; ++i)
+		{
+			memcpy(buffer.data() + offset, &position[i * 3], 3 * sizeof(float)); // Copy position
+			offset += 3 * sizeof(float);
+
+			memcpy(buffer.data() + offset, &normal[i * 3], 3 * sizeof(float)); // Copy normal
+			offset += 3 * sizeof(float);
+
+			memcpy(buffer.data() + offset, &uv[i * 2], 2 * sizeof(float)); // Copy uv
+			offset += 2 * sizeof(float);
+
+			memcpy(buffer.data() + offset, &boneWeights[i * 3], 3 * sizeof(float)); // Copy bone weights
+			offset += 3 * sizeof(float);
+
+			memcpy(buffer.data() + offset, &boneIndices[i * 3], 3 * sizeof(uint32_t)); // Copy bone indices
+			offset += 3 * sizeof(uint32_t);
+		}
+
+		// Send the interleaved buffer to the GPU
+		Mesh::_sendVboEbo(m_vbo, GL_ARRAY_BUFFER, buffer.size(), buffer.data());
+
+		// Enable and set vertex attributes
+		glEnableVertexAttribArray(0); // Position attribute
+		zglCheckOpenGL();
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(0));
+		zglCheckOpenGL();
+
+		glEnableVertexAttribArray(1); // Normal attribute
+		zglCheckOpenGL();
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(3 * sizeof(float)));
+		zglCheckOpenGL();
+
+		glEnableVertexAttribArray(2); // UV attribute
+		zglCheckOpenGL();
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(6 * sizeof(float)));
+		zglCheckOpenGL();
+
+		glEnableVertexAttribArray(3); // Bone weights attribute
+		zglCheckOpenGL();
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(8 * sizeof(float)));
+		zglCheckOpenGL();
+
+		glEnableVertexAttribArray(4); // Bone indices attribute
+		zglCheckOpenGL();
+		glVertexAttribIPointer(4, 3, GL_UNSIGNED_INT, stride, reinterpret_cast<void*>(8 * sizeof(float) + 3 * sizeof(float)));
+		zglCheckOpenGL();
+
+		// Send indices to GPU if available
+		if (!indices.empty())
+		{
+			Mesh::_sendVboEbo(m_ebo, GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(IndexType), indices.data());
+		}
+
+		std::cout
+			<< "[Mesh -X] Sent "
+			<< buffer.size()
+			<< " bytes with "
+			<< (this->hasIndex() ? "an index" : "no index")
+			<< ", a stride of " << stride
+			<< ", and a count of " << m_count
+			<< std::endl;
+	}
 
 
 } // End namespace zgl
