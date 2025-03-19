@@ -148,6 +148,8 @@ namespace zgl
 		weights.resize(nbrOfVertices*3);
 		boneIndices.resize(nbrOfVertices*3);
 
+
+
 		for (size_t iVertex = 0; iVertex < nbrOfVertices; ++iVertex) {
 			int iFirstClosest = 0, iSecondClosest = 0, iThirdClosest = 0;
 			float distFirst = -1, distSecond = -1, distThird = -1;
@@ -193,11 +195,6 @@ namespace zgl
 			// Inverse distance weights
 			float totalDist = std::max(0.f, distFirst) + std::max(0.f, distSecond) + std::max(0.f, distThird);
 			assert(totalDist > 0);
-			std::cout
-				<< " total:" << totalDist
-				<< " first:" << distFirst
-				<< " second:" << distSecond
-				<< " third:" << distThird << std::endl;
 			if (totalDist > 0) {
 				weights[iVertex * 3] = std::max(0.f, distFirst) / totalDist;
 				weights[iVertex * 3 + 1] = std::max(0.f, distSecond) / totalDist;
@@ -207,11 +204,6 @@ namespace zgl
 				weights[iVertex * 3 + 1] = 0.0f;
 				weights[iVertex * 3 + 2] = 0.0f;
 			}
-			std::cout
-				<< " " << weights[iVertex * 3]
-				<< " " << weights[iVertex * 3 + 1]
-				<< " " << weights[iVertex * 3 + 2]
-				<< std::endl <<  std::endl;
 			assert(std::abs(weights[iVertex * 3] + weights[iVertex * 3 + 1] + weights[iVertex * 3 + 2] - 1.0) <= 0.0001);
 
 			// Store the bone indices
@@ -222,13 +214,12 @@ namespace zgl
 	}
 
 	
-	Mesh Loader3D::loadAnimatedCylinder(size_t nbrArcs, size_t nbrSections, size_t nbrOfBones)
+	Mesh Loader3D::loadAnimatedCylinder(size_t nbrArcs, size_t nbrSections, size_t nbrOfBones, float lenght, float radius)
 	{
-		(void)nbrOfBones; // TODO add skeleton
 		Mesh mesh;
 		mesh.init(/*t_nAttributes*/5, /*t_useIndex*/true, GL_TRIANGLE_STRIP);
 
-		float axleIncrement = 1.0f / static_cast<float>(nbrSections);
+		float axleIncrement = lenght / static_cast<float>(nbrSections);
 		float phiIncrement = static_cast<float>((2.0 * M_PI) / static_cast<double>(nbrArcs));
 
 		std::vector<float> positions;
@@ -244,9 +235,9 @@ namespace zgl
 				float phi = static_cast<float>(iArcSegment) * phiIncrement;
 
 				// Position
-				float x = static_cast<float>(cos(static_cast<double>(phi)));
-				float y = static_cast<float>(sin(static_cast<double>(phi)));
-				float z = axlePos;
+				float x = radius * static_cast<float>(cos(static_cast<double>(phi)));
+				float y = radius * static_cast<float>(sin(static_cast<double>(phi)));
+				float z = axlePos - lenght/2;
 				positions.push_back(x);
 				positions.push_back(y);
 				positions.push_back(z);
@@ -280,14 +271,12 @@ namespace zgl
 
 		// Create bones
 		std::vector<float> handles;
-		auto handlesSpacing = 1.0f / static_cast<float>(nbrOfBones + 1);
-		//auto handlesSpacing = 1.0f / static_cast<float>(nbrOfBones);
+		auto handlesSpacing = lenght / static_cast<float>(nbrOfBones + 1);
 		for(size_t iBone = 0; iBone < nbrOfBones; ++iBone)
 		{
 			handles.push_back(0);
 			handles.push_back(0);
-			handles.push_back(static_cast<float>(iBone + 1)*handlesSpacing);
-			//handles.push_back(static_cast<float>(iBone)*handlesSpacing);
+			handles.push_back(static_cast<float>(iBone + 1)*handlesSpacing - lenght / 2);
 		}
 
 		// Assign a weight to 3 bones for each vertices

@@ -48,7 +48,8 @@ vec3 mixBoneColors(vec3 weights, ivec3 boneIndices)
 
 
 void main() {
-	//FragColor = vec3(v_weights);
+	//FragColor = sqrt(v_weights);
+	//FragColor = v_weights;
 	FragColor = mixBoneColors(v_weights, v_boneIndices);
 }
 

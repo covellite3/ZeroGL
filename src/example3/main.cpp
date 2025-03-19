@@ -126,12 +126,12 @@ void init()
 	screen->attachComponent(Component::Key::RENDERER_0, basicRenderer);
 	screen->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
 
-	auto meshCylinder = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadAnimatedCylinder(50, 50, 6)));
+	auto meshCylinder = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadAnimatedCylinder(50, 50, 6, 5.0f, 0.3f)));
 	auto modelCylinder = std::make_shared<Model>();
 	modelCylinder->setMesh(meshCylinder);
 	modelCylinder->setTexture(tex1);
 	auto componentCylinder = std::static_pointer_cast<zgl::Component>(modelCylinder);
-	auto cylinder = std::make_shared<Entity>(glm::vec3(4.0f, -1.0f, 0.0f), glm::vec3(0.3f, 0.3f, 5.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	auto cylinder = std::make_shared<Entity>(glm::vec3(4.0f, -1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	cylinder->attachComponent(Component::Key::MODEL, componentCylinder);
 	cylinder->attachComponent(Component::Key::RENDERER_0, skeletonRenderer);
 	cylinder->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);

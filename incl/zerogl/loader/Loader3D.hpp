@@ -29,7 +29,9 @@ namespace zgl
 		static Mesh loadAnimatedCylinder(
 				size_t nbrCircleSegments,
 				size_t nbrRadialSegments,
-				size_t nbrOfBones);
+				size_t nbrOfBones,
+				float lenght,
+				float radius);
 
 		static void calculateBoneWeights(
 				const std::vector<float>& positions,
