@@ -89,7 +89,7 @@ void init()
 	light->setPosition(glm::vec3(25, 50, 40));
 	light->lookAt(glm::vec3(0,0,0), glm::vec3(0,1,0));
 
-	light->setPerspective(glm::radians(45.0f), 1.0, 0.1f, 1000.0f);
+	light->setOrthographic(-20, 20, -20, 20, 0.1f, 1000.0f);
 	light->setFramebuffer(std::make_shared<FrameBuffer>());
 	light->getFramebuffer()->init(0, 0, 2048, 2048);
 	light->getFramebuffer()->attachTexture(); // TODO remove color attachment for shadowmap
