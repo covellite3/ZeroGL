@@ -25,6 +25,7 @@ namespace zgl
 	{
 	private:
 		struct Node {
+			~Node();
 			uint8_t m_poseIdx;
 			Node *m_left, *m_right;
 			inline Node(uint8_t t_poseIdx) : m_poseIdx(t_poseIdx), m_left(nullptr), m_right(nullptr) {};
@@ -44,6 +45,14 @@ namespace zgl
 	protected:
 	public:
 		inline Skeleton() : m_root(nullptr) {}
+		~Skeleton();
+
+		// Delete copy constructor and copy assignment operator
+		Skeleton(const Skeleton&) = delete;
+		Skeleton& operator=(const Skeleton&) = delete;
+
+		Skeleton(Skeleton&&);
+		Skeleton& operator=(Skeleton&&);
 
 		inline void hierarchize(Pose& pose) const
 		{
