@@ -2,151 +2,68 @@
  * Lighting include for shaders.
  */
 
-/**
- * Struct of the camera.
- */
-struct Camera {
-	vec3 pos;
-	vec3 direction;
-};
+/** Shadow mappin */
+float shadowmapping(sampler2D shadowmap, vec3 normal, vec3 directionLight, vec4 lightFragPos, float minimumBias, float paramBias, int radius)
+{
+	// Shadowmap 
+	float shadowness = 0.0f; // How much in the shadow
+	vec2 shadowMapPixelSize = 1.0 / textureSize(shadowmap, 0);
+	vec3 clipLightFragPos = lightFragPos.xyz / lightFragPos.w; // clip space
+	if(	clipLightFragPos.z <=  1.0f &&
+		clipLightFragPos.x <=  1.0f &&
+		clipLightFragPos.y <=  1.0f &&
+		clipLightFragPos.z >= -1.0f &&
+		clipLightFragPos.x >= -1.0f &&
+		clipLightFragPos.y >= -1.0f) {
+		// Inside the frustrum of the shadowmap's camera
+		vec3 shadowMapFragPos = (clipLightFragPos + 1.0f) / 2.0f; // Shift to range [0;1]
+		float bias = max(paramBias * (1.0f - dot(normal, directionLight)), minimumBias);
+		// Soft shadow
+		for(int y = -radius; y <= radius; ++y)
+		{
+			for(int x = -radius; x <= radius; ++x)
+			{
+				float shadowMapDepth = texture(shadowmap, shadowMapFragPos.xy + vec2(x, y)*shadowMapPixelSize).r;
+				if(shadowMapFragPos.z > shadowMapDepth + bias) {
+					shadowness += 1.0f;
+				}
 
-/**
- * Struct of one point of light, emite in all direction, weakening with distance.
- */
-struct Light {
-	float ambient;
-	vec3 color;
-	vec3 direction;
-};
-
-/**
- * Struct of the shinness dampness and normal of surface material
- */
-struct PhongMaterial {
-	float scatterness;
-	float shinness;
-	vec3 normal;
-	vec3 ambientColor; 
-	vec3 diffuseColor;
-	vec3 specularColor;
-};
-
-/**
- * Constructor Camera.
- */
-Camera getCamera(vec3 pos, vec3 direction) {
-	Camera cam;
-	cam.pos = pos;
-	cam.direction = direction;
-	return cam;
+			}
+		}
+		shadowness /= pow((radius*2 + 1), 2);
+	}
+	return shadowness;
 }
 
-/**
- * Constructor SunLight.
- */
-Light getLight(float ambient, vec3 color, vec3 direction) {
-	Light light;
-	light.ambient = ambient;
-	light.color = color;
-	light.direction = direction;
-	return light;
-}
 
-/**
- * Constructor Phong's SurfaceMaterial.
- */
- PhongMaterial getPhongMaterial(float scatterness, float shinness, vec3 normal, vec3 ambientColor, vec3 diffuseColor, vec3 specularColor) {
- 	PhongMaterial surface;
- 	surface.scatterness = scatterness;
- 	surface.shinness = shinness;
- 	surface.normal = normal;
-	surface.ambientColor = ambientColor;
-	surface.diffuseColor = diffuseColor;
-	surface.specularColor = specularColor;
- 	return surface;
- }
+///
+///
+///
+///
+///
 
 
-
-/**
- * Get pos from view matrix.
- */
-vec3 getPosFromView(mat4 viewMat) {
-	return -viewMat[3].xyz;
-}
-
-/**
- * Get direction from view matrix.
- */
-vec3 getDirectionFromView(mat4 viewMat) {
-	return -transpose(viewMat)[2].xyz;
-}
-
-/**
- * Get Phong's lighting.
- */
-
-vec3 getPhongLighting(Camera cam, Light light, PhongMaterial surface) {
-	// Normalize camera direction to ensure correct calculation
-	vec3 normalizedCamDirection = normalize(cam.direction);
-
-	// Diffuse
-	float diffuseFactor = max(dot(-light.direction, surface.normal), 0.0f) * surface.scatterness;
-
-	// Specular
-	vec3 reflectedDirectionalLight = reflect(-light.direction, surface.normal);
-	float specularFactor = pow(max(dot(normalizedCamDirection, reflectedDirectionalLight), 0.0f), surface.shinness);
-
-	// Ambient
-	vec3 ambientColor = surface.ambientColor * light.ambient;
-
-	// Diffuse + Specular components
-	vec3 diffuseColor = diffuseFactor * surface.diffuseColor * light.color;  // Mixing diffuse component
-	vec3 specularColor = specularFactor * surface.specularColor * light.color;  // Mixing specular component
-
-	// Return the final color
-	return max(ambientColor, min(diffuseColor + specularColor, vec3(1.0)));
+void blinnPhong(float shininess, vec3 normal, vec3 directionLight, vec3 positionCamera, vec3 fragPos, out float diffuse, out float specular)
+{
+	// Blinn-Phong lighting
+	diffuse = max(0.0f, dot(normal, directionLight));
+	specular = 0.0f;
+	if(diffuse >= 0.0f) {
+		vec3 viewDirection = normalize(positionCamera - fragPos);
+		vec3 reflectedLight = reflect(directionLight, normal);
+		vec3 halfvec = normalize(viewDirection + directionLight);
+		specular = pow(max(0.0f, dot(normal, halfvec)), shininess);
+	}
 }
 
 
 
+///
+///
+///
+///
+///
 
-/**
- * Get normal from texture's rgb value.
- */
- vec3 getNormalFromRGB(vec3 color) {
- 	return color.xyz * 2.0 - 1.0;
- }
-
-//
-// Rough Dielectric Material
-//
-
-/**
- * TODO
- */
-struct RDM_Material {
-	float roughness;
-	float IOR;
-	vec3 normal;
-	vec3 ambientColor;
-	vec3 diffuseColor;
-	vec3 specularColor;
-};
-
-/**
- * Constructor for RDM_Material.
- */
-RDM_Material getRDM_Material(float roughness, float IOR, vec3 normal, vec3 ambientColor, vec3 diffuseColor, vec3 specularColor) {
-	RDM_Material material;
-	material.roughness = roughness;
-	material.IOR = IOR;
-	material.normal = normal;
-	material.ambientColor = ambientColor;
-	material.diffuseColor = diffuseColor;
-	material.specularColor = specularColor;
-	return material;
-}
 
 float RDM_chiplus(float c) {
 	return (c > 0.0) ? 1.0 : 0.0;
@@ -223,11 +140,11 @@ vec3 RDM_bsdf(float LdotH, float NdotH, float VdotH, float LdotN, float VdotN, f
 /**
  * Get RDM Lighting based on Cook-Torrance model.
  */
-vec3 getRDM_Lighting(Camera cam, Light light, RDM_Material material) {
+/*vec3 getRDM_Lighting(Camera cam, Light light, RDM_Material material) {
 	// TODO rewrite this
 	vec3 n = material.normal;
-	vec3 v = -cam.direction;
-	vec3 l = -light.direction;
+	vec3 v = cam.direction;
+	vec3 l = light.direction;
 	vec3 lc = light.color; 
 	vec3 h = normalize(v + l);
 
@@ -241,14 +158,7 @@ vec3 getRDM_Lighting(Camera cam, Light light, RDM_Material material) {
 
 	vec3 bsdf = RDM_bsdf(LdotH, NdotH, VdotH, LdotN, VdotN, material.roughness, material.IOR, material.specularColor, material.diffuseColor);
 	return clamp(lc * bsdf * LdotN, 0.0, 1.0);
-}
-
-
-//
-// Shadow map
-//
-
-/*bool isInShadown(sampler2D shadowMap, mat4 lightWorldViewProjectionMat, lightSpacePosition)
-{
-	return false; 
 }*/
+
+
+
