@@ -63,7 +63,7 @@ void init()
 	zglCheckOpenGL();
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE); 
+	//glEnable(GL_CULL_FACE); 
 	glCullFace(GL_FRONT);
 	zglCheckOpenGL();
 
@@ -72,9 +72,10 @@ void init()
 	//////
 
 	// Assets
-	auto shadowmapRenderer = Renderer::make("shadowmap");
-	auto basicRenderer = Renderer::make("basic");
-	auto skeletonRenderer = Renderer::make("skeleton");
+	auto notAnimatedShadowmapRenderer = Renderer::make("notAnimated", "shadowmap");
+	auto animatedShadowmapRenderer = Renderer::make("animated", "shadowmap");
+	auto notAnimatedRenderer = Renderer::make("notAnimated", "basic");
+	auto animatedRenderer = Renderer::make("animated", "skeleton");
 	auto tex1 = zgl::Texture::make("dirt");
 	auto tex2 = zgl::Texture::make("tex2");
 
@@ -105,8 +106,8 @@ void init()
 	auto component1 = std::static_pointer_cast<zgl::Component>(model1);
 	auto entity = std::make_shared<Entity>(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	entity->attachComponent(Component::Key::MODEL, component1);
-	entity->attachComponent(Component::Key::RENDERER_0, basicRenderer);
-	entity->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
+	entity->attachComponent(Component::Key::RENDERER_0, notAnimatedRenderer);
+	entity->attachComponent(Component::Key::RENDERER_1, notAnimatedShadowmapRenderer);
 
 	auto mesh2 = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadCube()));
 	auto model2 = std::make_shared<Model>();
@@ -115,8 +116,8 @@ void init()
 	auto component2 = std::static_pointer_cast<zgl::Component>(model2);
 	auto ground = std::make_shared<Entity>(glm::vec3(0.0f, -4.0f, 0.0f), glm::vec3(15.0f, 1.f, 15.f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	ground->attachComponent(Component::Key::MODEL, component2);
-	ground->attachComponent(Component::Key::RENDERER_0, basicRenderer);
-	ground->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
+	ground->attachComponent(Component::Key::RENDERER_0, notAnimatedRenderer);
+	ground->attachComponent(Component::Key::RENDERER_1, notAnimatedShadowmapRenderer);
 
 	auto meshQuad = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadQuad()));
 	auto modelQuad = std::make_shared<Model>();
@@ -125,8 +126,8 @@ void init()
 	auto componentQuad = std::static_pointer_cast<zgl::Component>(modelQuad);
 	auto screen = std::make_shared<Entity>(glm::vec3(0.0f, 1.5f, -2.0f), glm::vec3(3.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	screen->attachComponent(Component::Key::MODEL, componentQuad);
-	screen->attachComponent(Component::Key::RENDERER_0, basicRenderer);
-	screen->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
+	screen->attachComponent(Component::Key::RENDERER_0, notAnimatedRenderer);
+	screen->attachComponent(Component::Key::RENDERER_1, notAnimatedShadowmapRenderer);
 
 	auto tupleCylinder = Loader3D::loadAnimatedCylinder(50, 50, 2, 5.0f, 0.3f);
 	auto meshCylinder = std::make_shared<zgl::Mesh>(std::move(std::get<0>(tupleCylinder)));
@@ -153,8 +154,8 @@ void init()
 	cylinder->attachComponent(Component::Key::MODEL, std::static_pointer_cast<zgl::Component>(modelCylinder));
 	cylinder->attachComponent(Component::Key::SKELETON, std::static_pointer_cast<zgl::Component>(skeletonCylinder));
 	cylinder->attachComponent(Component::Key::ANIMATION, std::static_pointer_cast<zgl::Component>(anim));
-	cylinder->attachComponent(Component::Key::RENDERER_0, skeletonRenderer);
-	cylinder->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
+	cylinder->attachComponent(Component::Key::RENDERER_0, animatedRenderer);
+	cylinder->attachComponent(Component::Key::RENDERER_1, animatedShadowmapRenderer);
 
 
 

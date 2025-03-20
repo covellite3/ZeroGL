@@ -176,7 +176,7 @@ namespace zgl
 		static inline void unbind();
 
 		/** Make a shader program from assets/lib/std/ of given name. */
-		static std::shared_ptr<ShaderProgram> make(const std::string& name);
+		static std::shared_ptr<ShaderProgram> make(const std::string& vertexName, const std::string& fragmentName);
 
 	}; // End class ShaderProgram
 

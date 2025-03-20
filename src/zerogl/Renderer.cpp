@@ -90,9 +90,9 @@ namespace zgl
 	}
 
 
-	std::shared_ptr<Renderer> Renderer::make(const std::string& name)
+	std::shared_ptr<Renderer> Renderer::make(const std::string& vertexName, const std::string& fragmentName)
 	{
-		auto shaderProgram = ShaderProgram::make(name);
+		auto shaderProgram = ShaderProgram::make(vertexName, fragmentName);
 		auto renderer = std::make_shared<Renderer>();
 		renderer->setShaderProgram(shaderProgram);
 		return renderer;

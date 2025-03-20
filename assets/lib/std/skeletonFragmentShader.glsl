@@ -24,7 +24,7 @@ uniform float u_zFarLight;
 void main() {
 	//FragColor = sqrt(v_weights);
 	//FragColor = v_weights;
-	//FragColor = mixBoneColors(v_weights, v_boneIndices);
-	FragColor = colorifyVector(v_normal);
+	FragColor = mixBoneColors(v_weights, v_boneIndices);
+	//FragColor = colorifyVector(v_normal);
 }
 
