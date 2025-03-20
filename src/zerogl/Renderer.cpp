@@ -25,7 +25,7 @@ namespace zgl
 			skeleton.hierarchize(pose);
 			assert(pose.getTransformationSpace() == Pose::TransformationSpace::HIERARCHICAL);
 
-			std::cout << "Has skeleton or animation with " << pose.getNbrOfBones() << std::endl;
+			//std::cout << "[Renderer ? ] Has skeleton or animation with " << pose.getNbrOfBones() << std::endl;
 			for(size_t iBone = 0; iBone < pose.getNbrOfBones(); ++iBone) {
 				auto loc = m_shaderProgram->getUniformLocation(("u_bones["+std::to_string(iBone)+"]").c_str());
 				m_shaderProgram->setUniformMatrix(loc, pose[iBone].getMatrix());

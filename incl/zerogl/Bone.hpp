@@ -38,7 +38,7 @@ namespace zgl
 
 		inline glm::mat4 getMatrix() const
 		{
-			std::cout << "Bone::getMatrix " << glm::length(m_orientation) << std::endl;
+			//std::cout << "Bone::getMatrix " << glm::length(m_orientation) << std::endl;
 			assert(glm::abs(glm::length(m_orientation) - 1.0f) < 0.0001f); // Check if quaternion is normalized
 			glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), m_position);
 			glm::mat4 rotationMatrix = glm::mat4_cast(m_orientation);

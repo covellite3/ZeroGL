@@ -56,9 +56,9 @@ namespace zgl
 
 		// TODO Why compilator refuse non-const references ?
 		inline void attachComponent(const Component::Key& key, std::shared_ptr<Component> t_component) {
-			if (m_attachments.find(key) != m_attachments.end()) {
+			/*if (m_attachments.find(key) != m_attachments.end()) {
 				throw std::runtime_error("Component with this key already attached: " + std::to_string(static_cast<int>(key)));
-			}
+			}*/
 			m_attachments[key] = t_component;
 		}
 

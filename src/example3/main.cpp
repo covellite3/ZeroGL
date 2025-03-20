@@ -26,6 +26,10 @@ sf::Window window;
 Scene scene;
 std::shared_ptr<Light> light;
 std::shared_ptr<Camera> camera;
+std::shared_ptr<Entity> cylinder;
+std::shared_ptr<Renderer> animatedRenderer, skeletonRenderer;
+
+bool freeCamera = false;
 
 void init()
 {
@@ -75,7 +79,8 @@ void init()
 	auto notAnimatedShadowmapRenderer = Renderer::make("notAnimated", "shadowmap");
 	auto animatedShadowmapRenderer = Renderer::make("animated", "shadowmap");
 	auto notAnimatedRenderer = Renderer::make("notAnimated", "basic");
-	auto animatedRenderer = Renderer::make("animated", "skeleton");
+	animatedRenderer = Renderer::make("animated", "basic");
+	skeletonRenderer = Renderer::make("animated", "skeleton");
 	auto tex1 = zgl::Texture::make("dirt");
 	auto tex2 = zgl::Texture::make("tex2");
 
@@ -150,7 +155,7 @@ void init()
 	anim->addFrame(sf::seconds(8.0f), poseRest);
 	modelCylinder->setMesh(meshCylinder);
 	modelCylinder->setTexture(tex1);
-	auto cylinder = std::make_shared<Entity>(glm::vec3(6.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	cylinder = std::make_shared<Entity>(glm::vec3(6.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 	cylinder->attachComponent(Component::Key::MODEL, std::static_pointer_cast<zgl::Component>(modelCylinder));
 	cylinder->attachComponent(Component::Key::SKELETON, std::static_pointer_cast<zgl::Component>(skeletonCylinder));
 	cylinder->attachComponent(Component::Key::ANIMATION, std::static_pointer_cast<zgl::Component>(anim));
@@ -234,6 +239,28 @@ void loop()
 					window.close();
 				}
 
+				if(event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::M)
+				{
+					std::cout << "[EVENT] Change camera mode" << std::endl;
+					freeCamera = !freeCamera;
+				}
+
+				if(event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::L)
+				{
+					std::cout << "[EVENT] Restart program clock" << std::endl;
+					programClock.restart();
+				}
+
+				if(event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Equal)
+				{
+					std::cout << "[EVENT] Change renderer attached to cylinder" << std::endl;
+					if(&cylinder->getAttachment<Renderer>(Component::Key::RENDERER_0) == animatedRenderer.get()) {
+						cylinder->attachComponent(Component::Key::RENDERER_0, skeletonRenderer);
+					} else {
+						cylinder->attachComponent(Component::Key::RENDERER_0, animatedRenderer);
+					}
+				}
+
 				if(event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Z)
 				{
 					camera->moveFoward(moveSpeed*dt*(1.0f/static_cast<float>(previous_iter_count)));
@@ -262,10 +289,7 @@ void loop()
 		}
 
 
-		camera->lookAt(glm::vec3(0,-1,0), glm::vec3(0,1,0));
-		//camera->setRotorOrientation(light->getRotorOrientation());
-		//camera->setPosition(light->getPosition());
-
+		if(!freeCamera) camera->lookAt(glm::vec3(0,-1,0), glm::vec3(0,1,0));
 
 		// Render shadow map
 		scene.render(Component::Key::RENDERER_1, *light, programClock.getElapsedTime()); 
