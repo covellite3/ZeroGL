@@ -2,6 +2,27 @@
  * Lighting include for shaders.
  */
 
+#define PI 3.14159265359
+
+struct Light {
+	vec3 direction;
+	vec3 color;
+};
+
+struct Camera {
+	vec3 position;
+	vec3 direction;
+};
+
+struct Material {
+	vec3 normal;
+	float shininess;
+	float metallic;
+	float IOR;
+	float roughness;
+ 	vec3 baseColor;
+};
+
 /** Shadow mappin */
 float shadowmapping(sampler2D shadowmap, vec3 normal, vec3 directionLight, vec4 lightFragPos, float minimumBias, float paramBias, int radius)
 {
@@ -43,21 +64,20 @@ float shadowmapping(sampler2D shadowmap, vec3 normal, vec3 directionLight, vec4 
 ///
 
 
-void blinnPhong(float shininess, vec3 normal, vec3 directionLight, vec3 positionCamera, vec3 fragPos, out float diffuse, out float specular)
+
+void blinnPhong(Camera camera, Light light, Material material, out float diffuse, out float specular)
 {
-	// Blinn-Phong lighting
-	diffuse = max(0.0f, dot(normal, directionLight));
+	diffuse = max(0.0f, dot(material.normal, light.direction));
 	specular = 0.0f;
-	if(diffuse >= 0.0f) {
-		vec3 viewDirection = normalize(positionCamera - fragPos);
-		vec3 reflectedLight = reflect(directionLight, normal);
-		vec3 halfvec = normalize(viewDirection + directionLight);
-		specular = pow(max(0.0f, dot(normal, halfvec)), shininess);
+	if (diffuse >= 0.0f) {
+		vec3 halfvec = normalize(camera.direction + light.direction);
+		specular = pow(max(0.0f, dot(material.normal, halfvec)), material.shininess);
 	}
 }
 
 
 
+
 ///
 ///
 ///
@@ -65,100 +85,70 @@ void blinnPhong(float shininess, vec3 normal, vec3 directionLight, vec3 position
 ///
 
 
-float RDM_chiplus(float c) {
+float chiplus(float c) {
 	return (c > 0.0) ? 1.0 : 0.0;
 }
 
-float RDM_Beckmann(float NdotH, float alpha) {
-	float cos2h = pow(NdotH, 2.0);
-	float cos4h = pow(cos2h, 2.0);
-	float tan2h = (1.0 - cos2h) / cos2h;
-	float alpha2 = alpha * alpha;
-	return RDM_chiplus(NdotH) * (exp(-tan2h / alpha2) / (3.14159265359 * alpha2 * cos4h));
-}
-
-float RDM_Fresnel(float LdotH, float extIOR, float intIOR) {
-	float n1_cos_theta_i = extIOR * LdotH;
-	float n2_cos_theta_i = intIOR * LdotH;
-
-	float sin2_theta_t = pow(extIOR / intIOR, 2.0) * (1.0 - LdotH * LdotH);
-	if (sin2_theta_t > 1.0) {
-		return 1.0; // Total internal reflection
-	}
-
-	float cos_theta_t = sqrt(1.0 - sin2_theta_t);
-	float n1_cos_theta_t = extIOR * cos_theta_t;
-	float n2_cos_theta_t = intIOR * cos_theta_t;
-
-	float Rs = pow(n1_cos_theta_i - n2_cos_theta_t, 2.0) / pow(n1_cos_theta_i + n2_cos_theta_t, 2.0);
-	float Rp = pow(n1_cos_theta_t - n2_cos_theta_i, 2.0) / pow(n1_cos_theta_t + n2_cos_theta_i, 2.0);
-
-	return 0.5 * (Rs + Rp);
-}
-
-float RDM_G1(float DdotH, float DdotN, float alpha) {
-	float k = DdotH / DdotN;
-	float cos_theta_x = DdotN;
-	float tan_theta_x = sqrt(1.0 - cos_theta_x * cos_theta_x) / cos_theta_x;
-	float b = 1.0 / (alpha * tan_theta_x);
-
-	float bb = b * b;
-	if (b < 1.6) {
-		return RDM_chiplus(k) * ((3.535 * b + 2.181 * bb) / (1.0 + 2.276 * b + 2.577 * bb));
-	} else {
-		return RDM_chiplus(k);
-	}
-}
-
-float RDM_Smith(float LdotH, float LdotN, float VdotH, float VdotN, float alpha) {
-	return RDM_G1(LdotH, LdotN, alpha) * RDM_G1(VdotH, VdotN, alpha);
-}
-
-vec3 RDM_bsdf_s(float LdotH, float NdotH, float VdotH, float LdotN, float VdotN, float roughness, float IOR, vec3 specular) {
-	float extIOR = 1.0;
-	float intIOR = IOR;
-	float D = RDM_Beckmann(NdotH, roughness);
-	float F = RDM_Fresnel(LdotH, extIOR, intIOR);
-	float G = RDM_Smith(LdotH, LdotN, VdotH, VdotN, roughness);
-	return specular * ((D * F * G) / (4.0 * LdotN * VdotN));
-}
-
-vec3 RDM_bsdf_d(vec3 diffuse) {
-	return diffuse / 3.14159265359;
-}
-
-vec3 RDM_bsdf(float LdotH, float NdotH, float VdotH, float LdotN, float VdotN, float roughness, float IOR, vec3 specular, vec3 diffuse) {
-	vec3 bsdf_s = vec3(0.0);
-	if (VdotN > 0.0 && LdotN > 0.0) {
-		bsdf_s = RDM_bsdf_s(LdotH, NdotH, VdotH, LdotN, VdotN, roughness, IOR, specular);
-	}
-
-	vec3 bsdf_d = RDM_bsdf_d(diffuse);
-	return bsdf_d + bsdf_s;
-}
-
-/**
- * Get RDM Lighting based on Cook-Torrance model.
- */
-/*vec3 getRDM_Lighting(Camera cam, Light light, RDM_Material material) {
-	// TODO rewrite this
+float specular_brdf(Camera cam, Light light, Material material)
+{
 	vec3 n = material.normal;
 	vec3 v = cam.direction;
 	vec3 l = light.direction;
 	vec3 lc = light.color; 
 	vec3 h = normalize(v + l);
 
-	const float eps = 0.00000001;
+	float NdotL = dot(n, l);
+	float HdotL = dot(h, l);
+	float HdotV = dot(h, v);
+	float NdotV = dot(n, v);
+	float alphaSquare = pow(material.roughness, 4);
 
-	float LdotH = max(dot(l, h), eps);
-	float NdotH = max(dot(n, h), eps);
-	float VdotH = max(dot(v, h), eps);
-	float LdotN = max(dot(l, n), eps);
-	float VdotN = max(dot(v, n), eps);
+	float V =
+		chiplus(HdotL) /
+		(abs(NdotL)+sqrt(alphaSquare+(1-alphaSquare)*NdotL*NdotL));
 
-	vec3 bsdf = RDM_bsdf(LdotH, NdotH, VdotH, LdotN, VdotN, material.roughness, material.IOR, material.specularColor, material.diffuseColor);
-	return clamp(lc * bsdf * LdotN, 0.0, 1.0);
-}*/
+	float D =
+		chiplus(HdotV) /
+		(abs(NdotV)+sqrt(alphaSquare+(1-alphaSquare)*NdotV*NdotV));
 
 
 
+	return V*D;
+}
+
+
+vec3 diffuse_brdf(vec3 color)
+{
+	return (1/PI) * color;
+}
+
+float conductor_fresnel(float f0, float bsdf, float VdotH)
+{
+	return bsdf * (f0 + (1 - f0) * pow(1 - abs(VdotH), 5));
+}
+
+float fresnel_mix(float ior, float base, float layer, float VdotH) {
+	float f0 = pow((1-ior)/(1+ior), 2);
+	float fr = f0 + (1 - f0)*pow(1 - abs(VdotH), 5);
+	return mix(base, layer, fr);
+}
+
+vec3 brdf(Camera cam, Light light, Material material)
+{
+	vec3 n = material.normal;
+	vec3 v = cam.direction;
+	vec3 l = light.direction;
+	vec3 lc = light.color; 
+	vec3 h = normalize(v + l);
+	float VdotH = dot(v, h);
+
+	vec3 metal_brdf = specular_brdf(cam, light, material) * (material.baseColor.rgb + (1 - material.baseColor.rgb) * pow(1 - abs(VdotH),5));
+
+	vec3 dielectric_brdf = mix(
+		diffuse_brdf(material.baseColor.rgb),
+		vec3(specular_brdf(cam, light, material)),
+		0.04 + (1 - 0.04) * pow(1 - abs(VdotH), 5)
+	);
+
+	return mix(dielectric_brdf, metal_brdf, material.metallic);
+}

@@ -20,9 +20,8 @@ uniform float u_zNearLight;
 uniform float u_zFarLight;
 
 void main() {
-
 	// Params light
-	float ambient = 0.1f;
+	float ambient = 0.3f;
 	bool isSunLight = true; // Is matrix othro and parallel rays
 	float paramBias = 0.000025f; // Adaptative bias
 	float minimumBias = 0.00005f; // Minimum bias
@@ -30,10 +29,21 @@ void main() {
 	float a = 0.05; // Phong
 	float b = 0.005; // Phong
 
-	// Param Material
-	vec4 texColor = texture(u_tex, v_uv);
-	float shininess = 20.f;
+	Camera cam;
+	cam.position = u_positionCamera;
+	cam.direction = normalize(u_positionCamera - v_fragPos);
 
+
+	vec4 texColor = texture(u_tex, v_uv);
+	Material material;
+	material.normal = v_normal;
+	material.baseColor = texColor.xyz;
+	material.IOR = 1.5f;
+	material.roughness = 0.5;
+	material.metallic = 0.5;
+	material.shininess = 20.f;
+
+	// Type of light
 	vec3 directionLight;
 	float intensity;
 	if(isSunLight) {
@@ -48,11 +58,17 @@ void main() {
 		intensity = 1.0f/( a*distFragmentToLight*distFragmentToLight + b*distFragmentToLight + 1.0f);
 	}
 
-	float diffuse, specular;
-	blinnPhong(shininess, v_normal, directionLight, u_positionCamera, v_fragPos, diffuse, specular);
-	float shadowness = shadowmapping(u_shadowmap, v_normal, directionLight, v_lightFragPos, minimumBias, paramBias, radius);
-	float totalLighting = max(ambient, (diffuse + specular)*intensity*(1.0f-shadowness));
+	Light light;
+	light.direction = directionLight;
+	light.color = vec3(1.0f);
 
-	FragColor = vec3(totalLighting * texColor);
+	float shadowness = shadowmapping(u_shadowmap, v_normal, directionLight, v_lightFragPos, minimumBias, paramBias, radius);
+
+	/*float diffuse, specular;
+	blinnPhong(cam, light, material, diffuse, specular);
+	float totalLighting = max(ambient, (diffuse + specular)*intensity*(1.0f-shadowness));
+	FragColor = vec3(totalLighting * texColor);*/
+
+	FragColor = vec3(texColor)*vec3(ambient) + brdf(cam, light, material)*intensity*(1-shadowness);
 }
 
