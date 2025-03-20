@@ -6,21 +6,38 @@
  
 // Import header file.
 #include "zerogl/Renderer.hpp"
+#include "zerogl/Animation.hpp"
  
 namespace zgl
 {
-	void Renderer::render(Scene& scene, Camera& camera, Entity& entity)
+	void Renderer::render(Scene& scene, Camera& camera, Entity& entity, const sf::Time& time)
 	{
-		(void)scene;
-		Model& model = entity.getAttachment<Model>(Component::Key::MODEL);
-
 		zglCheckOpenGL();
 
+		Model& model = entity.getAttachment<Model>(Component::Key::MODEL);
+
+		// Animation
+		if(entity.hasAttachment(Component::Key::ANIMATION) && entity.hasAttachment(Component::Key::ANIMATION)) {
+			Skeleton& skeleton = entity.getAttachment<Skeleton>(Component::Key::SKELETON);
+			Animation& animation = entity.getAttachment<Animation>(Component::Key::ANIMATION);
+
+			Pose pose = animation[time];
+			skeleton.hierarchize(pose);
+			assert(pose.getTransformationSpace() == Pose::TransformationSpace::HIERARCHICAL);
+
+			std::cout << "Has skeleton or animation with " << pose.getNbrOfBones() << std::endl;
+			for(size_t iBone = 0; iBone < pose.getNbrOfBones(); ++iBone) {
+				auto loc = m_shaderProgram->getUniformLocation(("u_bones["+std::to_string(iBone)+"]").c_str());
+				m_shaderProgram->setUniformMatrix(loc, pose[iBone].getMatrix());
+			}
+		}
+
+
+		// Model View Perpective
 		glm::mat4 modelMat = entity.getModelMatrix();
 		glm::mat4 viewMat = camera.getViewMatrix();
 		glm::mat4 projMat = camera.getProjectionMatrix();
 
-		// Model View Perpective
 		auto loc = m_shaderProgram->getUniformLocation("u_modelMat");
 		m_shaderProgram->setUniformMatrix(loc, modelMat);
 
@@ -48,8 +65,6 @@ namespace zgl
 		loc = m_shaderProgram->getUniformLocation("u_lightProjMat");
 		auto lightProjMat = scene.getLight()->getProjectionMatrix() * scene.getLight()->getViewMatrix();
 		m_shaderProgram->setUniformMatrix(loc, lightProjMat);
-
-
 
 		// Texture
 		loc = m_shaderProgram->getUniformLocation("u_tex");

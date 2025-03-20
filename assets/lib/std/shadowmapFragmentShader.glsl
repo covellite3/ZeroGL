@@ -1,5 +1,7 @@
 #version 330 core
+
 //#include <assets/lib/std/incl/lighting.glsl>
+#include <assets/lib/std/incl/color.glsl>
 
 in vec2 v_uv;
 in vec3 v_normal;
@@ -16,12 +18,6 @@ uniform vec3 u_coordLight;
 uniform vec3 u_directionLight;
 uniform float u_zNearLight;
 uniform float u_zFarLight;
-
-float linearizeDepth(float depth, float zNear, float zFar)
-{
-	depth = (2.0f * zNear) / (zFar + zNear - depth * (zFar - zNear));
-	return depth;
-}
 
 void main() {
 	// Material

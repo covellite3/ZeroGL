@@ -4,6 +4,8 @@
 #include "zerogl/Renderer.hpp"
 #include "zerogl/Camera.hpp"
 #include "zerogl/Light.hpp"
+#include "zerogl/Pose.hpp"
+#include "zerogl/Animation.hpp"
 #include "zerogl/opengl/Texture.hpp"
 #include "zerogl/loader/Loader3D.hpp"
 
@@ -79,7 +81,7 @@ void init()
 	// Camera
 	std::cout << "Camera" << std::endl;
 	camera = std::make_shared<Camera>();
-	camera->setPosition(glm::vec3(0,0,10));
+	camera->setPosition(glm::vec3(15,7,0));
 
 	// Light
 	std::cout << "Light" << std::endl;
@@ -126,13 +128,31 @@ void init()
 	screen->attachComponent(Component::Key::RENDERER_0, basicRenderer);
 	screen->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
 
-	auto meshCylinder = std::make_shared<zgl::Mesh>(std::move(Loader3D::loadAnimatedCylinder(50, 50, 6, 5.0f, 0.3f)));
+	auto tupleCylinder = Loader3D::loadAnimatedCylinder(50, 50, 2, 5.0f, 0.3f);
+	auto meshCylinder = std::make_shared<zgl::Mesh>(std::move(std::get<0>(tupleCylinder)));
+	auto skeletonCylinder = std::make_shared<zgl::Skeleton>(std::move(std::get<1>(tupleCylinder)));
 	auto modelCylinder = std::make_shared<Model>();
+	zgl::Pose poseRest{ zgl::Pose::TransformationSpace::LOCAL, {Bone(), Bone()} };
+	zgl::Pose poseX{ zgl::Pose::TransformationSpace::LOCAL, {Bone(), Bone(glm::vec3(0.0), glm::quat(0.0f, 1.0f, 0.0f, 0.0f))} };
+	zgl::Pose poseY{ zgl::Pose::TransformationSpace::LOCAL, {Bone(), Bone(glm::vec3(0.0), glm::quat(0.0f, 0.0f, 1.0f, 0.0f))} };
+	zgl::Pose poseZ{ zgl::Pose::TransformationSpace::LOCAL, {Bone(), Bone(glm::vec3(0.0), glm::quat(0.0f, 0.0f, 0.0f, 1.0f))} };
+	zgl::Pose posePull{ zgl::Pose::TransformationSpace::LOCAL, {Bone(), Bone(glm::vec3(3.0), glm::quat(0.0f, 0.0f, 0.0f, 0.0f))} };
+	auto anim = std::make_shared<Animation>();
+	anim->addFrame(sf::seconds(0.0f), poseRest);
+	anim->addFrame(sf::seconds(1.0f), poseX);
+	anim->addFrame(sf::seconds(2.0f), poseRest);
+	anim->addFrame(sf::seconds(3.0f), poseY);
+	anim->addFrame(sf::seconds(4.0f), poseRest);
+	anim->addFrame(sf::seconds(5.0f), poseZ);
+	anim->addFrame(sf::seconds(6.0f), poseRest);
+	anim->addFrame(sf::seconds(7.0f), posePull);
+	anim->addFrame(sf::seconds(8.0f), poseRest);
 	modelCylinder->setMesh(meshCylinder);
 	modelCylinder->setTexture(tex1);
-	auto componentCylinder = std::static_pointer_cast<zgl::Component>(modelCylinder);
-	auto cylinder = std::make_shared<Entity>(glm::vec3(4.0f, -1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-	cylinder->attachComponent(Component::Key::MODEL, componentCylinder);
+	auto cylinder = std::make_shared<Entity>(glm::vec3(6.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+	cylinder->attachComponent(Component::Key::MODEL, std::static_pointer_cast<zgl::Component>(modelCylinder));
+	cylinder->attachComponent(Component::Key::SKELETON, std::static_pointer_cast<zgl::Component>(skeletonCylinder));
+	cylinder->attachComponent(Component::Key::ANIMATION, std::static_pointer_cast<zgl::Component>(anim));
 	cylinder->attachComponent(Component::Key::RENDERER_0, skeletonRenderer);
 	cylinder->attachComponent(Component::Key::RENDERER_1, shadowmapRenderer);
 
@@ -153,10 +173,12 @@ void init()
 
 void loop()
 {
+	//sf::Clock clock;
 	float moveSpeed = 10.f;
 	const float rotationSpeed = 10.f;
-	sf::Clock clock;
-	clock.start();
+	sf::Clock programClock, iterationClock;
+	programClock.start();
+	iterationClock.start();
 	float dt = 0;
 	size_t iter_count = 0, previous_iter_count = 0;
 	sf::Vector2i windowCenter, currentMousePosition;
@@ -164,11 +186,11 @@ void loop()
 	// Application loop.
 	while (window.isOpen())
 	{
-		if(clock.getElapsedTime().asSeconds() >= timeThreshold)
+		if(iterationClock.getElapsedTime().asSeconds() >= timeThreshold)
 		{
 			previous_iter_count = iter_count;
 			iter_count = 0;
-			dt = clock.restart().asSeconds();
+			dt = iterationClock.restart().asSeconds();
 						   
 			// Rotate camera based on mouse movement.
 			auto delta = currentMousePosition - windowCenter;
@@ -245,10 +267,10 @@ void loop()
 
 
 		// Render shadow map
-		scene.render(Component::Key::RENDERER_1, *light); 
+		scene.render(Component::Key::RENDERER_1, *light, programClock.getElapsedTime()); 
 
 		// Render final scene
-		scene.render(Component::Key::RENDERER_0, *camera);
+		scene.render(Component::Key::RENDERER_0, *camera, programClock.getElapsedTime());
 
 		window.display();
 		++iter_count;

@@ -1,5 +1,7 @@
 #version 330 core
+
 //#include <assets/lib/std/incl/lighting.glsl>
+#include <assets/lib/std/incl/color.glsl>
 
 in vec2 v_uv;
 in vec3 v_normal;
@@ -17,11 +19,7 @@ uniform vec3 u_directionLight;
 uniform float u_zNearLight;
 uniform float u_zFarLight;
 
-/** Put vector between [-1;1] into color space between [0;1] */
-vec3 colorifyVector(vec3 v)
-{
-	return (v + vec3(1.0f))/2;
-}
+
 
 void main() {
 

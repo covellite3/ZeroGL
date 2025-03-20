@@ -214,9 +214,11 @@ namespace zgl
 	}
 
 	
-	Mesh Loader3D::loadAnimatedCylinder(size_t nbrArcs, size_t nbrSections, size_t nbrOfBones, float lenght, float radius)
+	std::tuple<Mesh, Skeleton> Loader3D::loadAnimatedCylinder(size_t nbrArcs, size_t nbrSections, size_t nbrOfBones, float lenght, float radius)
 	{
-		Mesh mesh;
+		std::tuple<Mesh, Skeleton> meshAndSkeleton;
+		Mesh& mesh = std::get<0>(meshAndSkeleton);
+		Skeleton& skeleton = std::get<1>(meshAndSkeleton);
 		mesh.init(/*t_nAttributes*/5, /*t_useIndex*/true, GL_TRIANGLE_STRIP);
 
 		float axleIncrement = lenght / static_cast<float>(nbrSections);
@@ -269,15 +271,22 @@ namespace zgl
 			}
 		}
 
-		// Create bones
+		// Create bones & skeleton
 		std::vector<float> handles;
-		auto handlesSpacing = lenght / static_cast<float>(nbrOfBones + 1);
+		auto itTree = skeleton.addRoot(0);
+		auto handlesSpacing = lenght / static_cast<float>(nbrOfBones - 1);
 		for(size_t iBone = 0; iBone < nbrOfBones; ++iBone)
 		{
 			handles.push_back(0);
 			handles.push_back(0);
-			handles.push_back(static_cast<float>(iBone + 1)*handlesSpacing - lenght / 2);
+			handles.push_back(static_cast<float>(iBone)*handlesSpacing - lenght / 2);
+
+			if(iBone < nbrOfBones-1) {
+				itTree = itTree->addLeft(static_cast<uint8_t>(iBone+1));
+			}
+			
 		}
+		std::cout << "Loader3D skeleton tree: " << skeleton.getRoot()->toString() << std::endl;
 
 		// Assign a weight to 3 bones for each vertices
 		calculateBoneWeights(positions, handles, weights, boneIndices);
@@ -291,7 +300,7 @@ namespace zgl
 			std::span<Mesh::IndexType>(indices.data(), indices.size())
 		);
 
-		return mesh;
+		return meshAndSkeleton;
 	}
 
 } // End namespace zgl

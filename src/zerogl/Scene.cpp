@@ -9,7 +9,7 @@
 
 namespace zgl
 {
-	void Scene::render(const Component::Key& rendererType, Camera& camera)
+	void Scene::render(const Component::Key& rendererType, Camera& camera, const sf::Time& time)
 	{
 		// If camera has a valide framebuffer, we render to it otherwise we render to the default framebuffer (the screen)
 		if(camera.getFramebuffer() != nullptr && camera.getFramebuffer()->isInit()) {
@@ -38,7 +38,7 @@ namespace zgl
 		for(auto& p_entity : m_entities)
 		{
 			Renderer& renderer = dynamic_cast<Renderer&>(p_entity->template getAttachment<Renderer>(rendererType));
-			renderer.render(*this, camera, *p_entity.get());
+			renderer.render(*this, camera, *p_entity.get(), time);
 		}
 
 	}

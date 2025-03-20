@@ -14,6 +14,7 @@
 #include "zerogl/Entity.hpp"
 #include "zerogl/Scene.hpp"
 #include "zerogl/opengl/ShaderProgram.hpp"
+#include <SFML/System.hpp>
 #include <memory>
 // End includes
 
@@ -32,7 +33,7 @@ namespace zgl
 		std::shared_ptr<ShaderProgram> m_shaderProgram;
 	protected:
 	public:
-		void render(Scene& scene, Camera& camera, Entity& entity);
+		void render(Scene& scene, Camera& camera, Entity& entity, const sf::Time& time);
 
 		inline void setShaderProgram(std::shared_ptr<ShaderProgram> t_shaderProgram)
 		{

@@ -9,6 +9,8 @@
 
 // Includes
 #include "zerogl/Mesh.hpp"
+#include "zerogl/Skeleton.hpp"
+#include <tuple>
 // End includes
 
 namespace zgl
@@ -26,7 +28,7 @@ namespace zgl
 		static Mesh loadTriangle();
 		static Mesh loadQuad();
 		static Mesh loadCube();
-		static Mesh loadAnimatedCylinder(
+		static std::tuple<Mesh, Skeleton> loadAnimatedCylinder(
 				size_t nbrCircleSegments,
 				size_t nbrRadialSegments,
 				size_t nbrOfBones,

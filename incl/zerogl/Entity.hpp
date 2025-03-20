@@ -62,6 +62,11 @@ namespace zgl
 			m_attachments[key] = t_component;
 		}
 
+		inline bool hasAttachment(const Component::Key& key) const
+		{
+			return m_attachments.find(key) != m_attachments.end();
+		}
+
 		template<typename T>
 		inline T& getAttachment(const Component::Key& key);
 

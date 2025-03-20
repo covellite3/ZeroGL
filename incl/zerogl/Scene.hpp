@@ -13,6 +13,7 @@
 #include "zerogl/Renderer.hpp"
 #include "zerogl/Light.hpp"
 
+#include <SFML/System.hpp>
 #include <vector>
 // End includes
 
@@ -42,7 +43,7 @@ namespace zgl
 		/**
 		 * rendererType: RENDERER_0, RENDERER_1, ...
 		 */
-		void render(const Component::Key& rendererType, Camera& camera);
+		void render(const Component::Key& rendererType, Camera& camera, const sf::Time& time);
 
 		inline void add(std::shared_ptr<Entity>& entity) { m_entities.push_back(entity); }
 
